@@ -8,6 +8,7 @@ using namespace std;
 using namespace osuCrypto;
 
 #include "OtBinMain.h"
+#include "OtBinMain.v2.h"
 #include "bitPosition.h"
 
 #include <numeric>

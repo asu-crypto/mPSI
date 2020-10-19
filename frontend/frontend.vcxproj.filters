@@ -33,6 +33,9 @@
     <ClCompile Include="bitPosition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OtBinMain.v2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="util.h">
@@ -46,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="bitPosition.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OtBinMain.v2.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
