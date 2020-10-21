@@ -20,6 +20,9 @@ using namespace osuCrypto;
 #include <numeric>
 #include <iostream>
 #include "OtBinMain.v2.h"
+#include "gbf.h"
+
+
 
 void Channel_party_test(u64 myIdx, u64 nParties)
 {
@@ -123,165 +126,161 @@ void Channel_party_test(u64 myIdx, u64 nParties)
 	ios.stop();
 }
 
-//leader is n-1
-
-void GbfEncode(const std::vector<std::pair<block, block>> key_values, std::vector<block>& garbledBF)
+void party1_encode(std::vector<block> inputSet,  const std::vector<block> aesKeys, std::vector<block>& okvsTable, u64 nParties, u64 type_okvs, u64 type_security)
 {
-	u64 numHashFunctions = 40;
-	std::vector<AES> mBFHasher(numHashFunctions);
-	for (u64 i = 0; i < mBFHasher.size(); ++i)
-		mBFHasher[i].setKey(_mm_set1_epi64x(i));
-
-	u64 setSize = key_values.size();
-	u64 mBfBitCount = 60 * setSize;
-	garbledBF.resize(mBfBitCount);
-
-	std::vector<std::set<u64>> idxs(setSize);
-	for (u64 i = 0; i < setSize; ++i)
-	{
-		u64 firstFreeIdx(-1);
-		block sum = ZeroBlock;
-
-		//std::cout << "input[" << i << "] " << inputs[i] << std::endl;
-
-		//idxs.clear();
-		for (u64 hashIdx = 0; hashIdx < mBFHasher.size(); ++hashIdx)
-		{
-
-			block hashOut = mBFHasher[hashIdx].ecbEncBlock(key_values[i].first);
-			u64& idx = *(u64*)&hashOut;
-			idx %= mBfBitCount;
-			idxs[i].emplace(idx);
-
-			//std::cout << idx << " ";
-		}
-		//std::cout << "\n";
-
-		for (auto idx : idxs[i])
-		{
-			if (eq(garbledBF[idx], ZeroBlock))
-			{
-				if (firstFreeIdx == u64(-1))
-				{
-					firstFreeIdx = idx;
-					//std::cout << "firstFreeIdx: " << firstFreeIdx << std::endl;
-
-				}
-				else
-				{
-					garbledBF[idx] = _mm_set_epi64x(idx, idx);
-					//	std::cout << garbledBF[idx] <<"\n";
-					sum = sum ^ garbledBF[idx];
-					//std::cout << idx << " " << garbledBF[idx] << std::endl;
-				}
-			}
-			else
-			{
-				sum = sum ^ garbledBF[idx];
-				//std::cout << idx << " " << garbledBF[idx] << std::endl;
-			}
-		}
-
-		garbledBF[firstFreeIdx] = sum ^ key_values[i].second;
-		//std::cout << firstFreeIdx << " " << garbledBF[firstFreeIdx] << std::endl;
-		//std::cout << test << "\n";
-		//std::cout << "sender " << i << " *   " << garbledBF[firstFreeIdx] << "    " << firstFreeIdx << std::endl;
-	}
-}
-
-void GbfDecode(const std::vector<block> garbledBF, const std::vector<block> setKeys, std::vector<block>& setValues)
-{
-	u64 numHashFunctions = 40;
-	std::vector<AES> mBFHasher(numHashFunctions);
-	for (u64 i = 0; i < mBFHasher.size(); ++i)
-		mBFHasher[i].setKey(_mm_set1_epi64x(i));
-
-	u64 setSize = setKeys.size();
-	u64 mBfBitCount = 60 * setSize;
-	setValues.resize(setSize);
-
-	for (u64 i = 0; i < setSize; ++i)
-	{
-		//std::cout << "mSetY[" << i << "]= " << mSetY[i] << std::endl;
-		//	std::cout << mSetX[i] << std::endl;
-
-		std::set<u64> idxs;
-
-		for (u64 hashIdx = 0; hashIdx < mBFHasher.size(); ++hashIdx)
-		{
-			block hashOut = mBFHasher[hashIdx].ecbEncBlock(setKeys[i]);
-			u64& idx = *(u64*)&hashOut;
-			idx %= mBfBitCount;
-			idxs.emplace(idx);
-		}
-
-		setValues[i] = ZeroBlock;
-		for (auto idx : idxs)
-		{
-			///std::cout << idx << " " << garbledBF[idx] << std::endl;
-			setValues[i] = setValues[i] ^ garbledBF[idx];
-		}
-
-		//if (i == 0) //for test
-		//	std::cout << mSetY[0] << "\t vs \t" << sum << std::endl;
-	}
-
-}
-
-void GbfTest()
-{
-	PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 	
-	std::vector<std::pair<block, block>> key_values(128);
-	std::vector<block> setKeys(128);
-	std::vector<block> setValues(128);
+	std::vector<block> setValues(inputSet.size(), ZeroBlock), hashInputSet(inputSet.size());
+	std::vector<AES> vectorAES(nParties-2); //for party 2 -> (n-1)
+	std::vector <std::vector<block>> ciphertexts(nParties - 2); //ciphertexts[idxParty][idxItem]
 
-	for (u64 i = 0; i < key_values.size(); ++i)
+	for (u64 i = 0; i < vectorAES.size(); ++i)
 	{
-		key_values[i].first = prng.get<block>();
-		key_values[i].second = prng.get<block>();
-		setKeys[i] = key_values[i].first;
+		vectorAES[i].setKey(aesKeys[i]);
+		ciphertexts[i].resize(inputSet.size());
+	}
+	if(type_security==secMalicious)
+		mAesFixedKey.ecbEncBlocks(inputSet.data(), inputSet.size(), hashInputSet.data()); //H(xi)
+
+	for (u64 i = 0; i < vectorAES.size(); ++i)
+		if (type_security == secMalicious)
+			vectorAES[i].ecbEncBlocks(hashInputSet.data(), inputSet.size(), ciphertexts[i].data()); //compute F_ki(H(xi))
+		else
+			vectorAES[i].ecbEncBlocks(inputSet.data(), inputSet.size(), ciphertexts[i].data()); //compute F_ki(xi)
+
+	for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem)
+		for (u64 idxParty = 0; idxParty < ciphertexts.size(); ++idxParty)
+			setValues[idxItem] = setValues[idxItem] ^ ciphertexts[idxParty][idxItem];
+
+	if (type_okvs==GbfOkvs)
+		GbfEncode(inputSet, setValues, okvsTable);
+	
+	//if (type_okvs == PolyOkvs) //TODO
+}
+
+//for party 2->(n-2): returns okvsTable
+void party2_encode(const std::vector<block> inputSet, const block& aesKey, std::vector<block>& okvsTable,  u64 type_okvs, u64 type_security)
+{
+
+	std::vector<block> setValues(inputSet.size(), ZeroBlock), hashInputSet(inputSet.size());
+	AES aes(aesKey);
+
+	if (type_security == secMalicious)
+		mAesFixedKey.ecbEncBlocks(inputSet.data(), inputSet.size(), hashInputSet.data()); //H(xi)
+
+	if (type_security == secMalicious)
+		aes.ecbEncBlocks(hashInputSet.data(), inputSet.size(), setValues.data()); //compute F_ki(H(xi))
+	else
+		aes.ecbEncBlocks(inputSet.data(), inputSet.size(), setValues.data()); //compute F_ki(xi)
+
+	if (type_okvs == GbfOkvs)
+		GbfEncode(inputSet, setValues, okvsTable);
+
+	//if (type_okvs == PolyOkvs) //TODO
+}
+
+//for party n-1: return A~_{n-1}
+void partyn1_encode(const std::vector<block> inputSet, const block& aesKey, const std::vector <std::vector<block>> okvsTables, std::vector<block>& inputSet2PSI, u64 type_okvs, u64 type_security)
+{
+	inputSet2PSI.resize(inputSet.size(), ZeroBlock);
+	std::vector<block> hashInputSet(inputSet.size());
+	AES aes(aesKey);
+
+	if (type_security == secMalicious)
+		mAesFixedKey.ecbEncBlocks(inputSet.data(), inputSet.size(), hashInputSet.data()); //H(xi)
+
+	if (type_security == secMalicious)
+		aes.ecbEncBlocks(hashInputSet.data(), inputSet.size(), inputSet2PSI.data()); //compute F_ki(H(xi))
+	else
+		aes.ecbEncBlocks(inputSet.data(), inputSet.size(), inputSet2PSI.data()); //compute F_ki(xi)
+
+	for (u64 idxParty = 0; idxParty < okvsTables.size(); idxParty++) //okvsTables[idxParty]
+	{
+		std::vector<block> setValues(inputSet.size());
+		if (type_okvs == GbfOkvs)
+			GbfDecode(okvsTables[idxParty], inputSet, setValues); // setValues[idxItem]=Decode(okvsTables[idxParty], x)
+
+		for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem) //compute xor all decode() 
+			inputSet2PSI[idxItem] = inputSet2PSI[idxItem] ^ setValues[idxItem];
 	}
 
-	std::vector<block> garbledBF;
-	GbfEncode(key_values, garbledBF);
-	GbfDecode(garbledBF, setKeys, setValues);
-
-	std::cout << setValues[0] << " vs " << key_values[0].second << "\n";
+	for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem)
+		inputSet2PSI[idxItem] = inputSet2PSI[idxItem] ^ inputSet[idxItem]; //simulate x||F(x) xor all decodes
 
 }
 
-void party1(u64 nParties, u64 setSize)
+
+//for party n: return A~_n
+void partyn_encode(const std::vector<block> inputSet,  const std::vector<block> okvsTable, std::vector<block>& inputSet2PSI, u64 type_okvs, u64 type_security)
 {
+	inputSet2PSI.resize(inputSet.size(), ZeroBlock);
+	std::vector<block> hashInputSet(inputSet.size());
+
+	if (type_security == secMalicious)
+		mAesFixedKey.ecbEncBlocks(inputSet.data(), inputSet.size(), hashInputSet.data()); //H(xi)
+
+	if (type_okvs == GbfOkvs)
+		GbfDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
+
+
+	for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem)
+		inputSet2PSI[idxItem] = inputSet2PSI[idxItem] ^ inputSet[idxItem]; //simulate x||F(x) xor all decodes
+}
+
+void party_test()
+{
+	u64 nParties = 5, setSize = 6;
+	u64 party_n1 = nParties - 2; //party n-1
+	u64 party_n = nParties - 1; //party n
+
+	PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
+	std::vector <std::vector<block>> inputSets(nParties);
+	
+	for (u64 i = 0; i < nParties; ++i)
+	{
+		inputSets[i].resize(setSize);
+		for (u64 j = 0; j < setSize; ++j)
+			inputSets[i][j] = prng.get<block>();
+	}
+
+	for (u64 i = 1; i < nParties; ++i) //same items
+		for (u64 j = 0; j < 2; ++j)
+			inputSets[i][j] = inputSets[0][j];
+
+	//generating aes keys
+	std::vector<block> aesKeys(nParties - 2); //aesKeys[0] for party 2
+	for (u64 i = 0; i < aesKeys.size(); ++i)
+		aesKeys[i] = prng.get<block>();
+
+
+	std::vector<block> okvsTable1; //okvs of party1
+	party1_encode(inputSets[0], aesKeys, okvsTable1, nParties, GbfOkvs, secSemiHonest);
+
+	std::vector <std::vector<block>> okvsTables(nParties - 3); //okvs of party 2 -> n-2
+	for (u64 idxParty = 0; idxParty < okvsTables.size(); idxParty++) 
+		party2_encode(inputSets[idxParty+1], aesKeys[idxParty], okvsTables[idxParty], GbfOkvs, secSemiHonest);
+
+	std::vector<block> inputSet2PSI_n1; //party n-1
+	partyn1_encode(inputSets[party_n1], aesKeys[aesKeys.size()-1], okvsTables, inputSet2PSI_n1, GbfOkvs, secSemiHonest);
+
+	std::vector<block> inputSet2PSI_n; //party n
+	partyn_encode(inputSets[party_n],  okvsTable1, inputSet2PSI_n, GbfOkvs, secSemiHonest);
+
+	for (u64 j = 0; j < setSize; ++j)
+		std::cout << inputSet2PSI_n1[j] << " vs " << inputSet2PSI_n[j] << "\n";
 
 }
 
-void partyO1(u64 myIdx, u64 nParties, u64 tParties, u64 setSize, u64 nTrials)
+void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 nTrials, u64 type_okvs, u64 type_security)
 {
-#if 0
-	u64 opt = 0;
 	std::fstream runtime;
-	u64 leaderIdx = nParties - 1; //leader party
-
-	if (myIdx == 0)
-		runtime.open("./runtime_client.txt", runtime.app | runtime.out);
-
-	if (myIdx == leaderIdx)
-		runtime.open("./runtime_leader.txt", runtime.app | runtime.out);
+	runtime.open("./runtime_" + myIdx, runtime.app | runtime.out);
+	
+	u64 party_n_minus_1 = nParties - 2; //party n-1
+	u64 party_n = nParties - 1; //party n
 
 
 #pragma region setup
-
-	u64 ttParties = tParties;
-	if (tParties == nParties - 1)//it is sufficient to prevent n-2 ssClientTimecorrupted parties since if n-1 corrupted and only now the part of intersection if all has x, i.e. x is in intersection. 
-		ttParties = tParties - 1;
-	else if (tParties < 1) //make sure to do ss with at least one client
-		ttParties = 1;
-
-	u64 nSS = nParties - 1; //n-2 parties joinly operated secrete sharing
-	int tSS = ttParties; //ss with t next  parties, and last for leader => t+1  
-
-
+	
 	u64 offlineAvgTime(0), hashingAvgTime(0), getOPRFAvgTime(0),
 		ss2DirAvgTime(0), ssRoundAvgTime(0), intersectionAvgTime(0), onlineAvgTime(0);
 
@@ -323,71 +322,38 @@ void partyO1(u64 myIdx, u64 nParties, u64 tParties, u64 setSize, u64 nTrials)
 				//chls[i][j] = &ep[i].addChannel("chl" + std::to_string(j), "chl" + std::to_string(j));
 				chls[i][j] = &ep[i].addChannel(name, name);
 				//chls[i][j].mEndpoint;
-
-
-
 			}
 		}
 	}
 
-
 	u64 maskSize = roundUpTo(psiSecParam + 2 * std::log2(setSize) - 1, 8) / 8;
-	u64 nextNeighbor = (myIdx + 1) % nParties;
-	u64 prevNeighbor = (myIdx - 1 + nParties) % nParties;
 	u64 num_intersection;
 	double dataSent, Mbps, MbpsRecv, dataRecv;
-#pragma endregion
 
 	PRNG prngSame(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 	PRNG prngDiff(_mm_set_epi32(434653, 23, myIdx, myIdx));
 	u64 expected_intersection;
+	std::vector<block> set(setSize);
 
+#pragma endregion
+
+
+#if 0
 
 	for (u64 idxTrial = 0; idxTrial < nTrials; idxTrial++)
 	{
 #pragma region input
-		std::vector<block> set(setSize);
-
-		std::vector<std::vector<block>>
-			sendPayLoads(ttParties + 1), //include the last PayLoads to leader
-			recvPayLoads(ttParties); //received form clients
 
 		block blk_rand = prngSame.get<block>();
 		expected_intersection = (*(u64*)&blk_rand) % setSize;
 
 		for (u64 i = 0; i < expected_intersection; ++i)
-		{
 			set[i] = prngSame.get<block>();
-		}
 
 		for (u64 i = expected_intersection; i < setSize; ++i)
-		{
 			set[i] = prngDiff.get<block>();
-		}
-
-
-
-
-
-#ifdef PRINT	
-		std::cout << IoStream::lock;
-		if (myIdx != leaderIdx) {
-			for (u64 i = 0; i < setSize; ++i)
-			{
-				block check = ZeroBlock;
-				for (u64 idxP = 0; idxP < ttParties + 1; ++idxP)
-				{
-					//if (idxP != myIdx)
-					check = check ^ sendPayLoads[idxP][i];
-				}
-				if (memcmp((u8*)&check, &ZeroBlock, sizeof(block)))
-					std::cout << "Error ss values: myIdx: " << myIdx
-					<< " value: " << check << std::endl;
-			}
-		}
-		std::cout << IoStream::unlock;
-#endif
 #pragma endregion
+
 		u64 num_threads = nParties - 1; //except P0, and my
 		bool isDual = true;
 		u64 idx_start_dual = 0;
@@ -1172,7 +1138,7 @@ void O1nPSI_Test()
 		{
 			pThrds[pIdx] = std::thread([&, pIdx]() {
 				//Channel_party_test(pIdx, nParties);
-				partyO1(pIdx, nParties, tParties, setSize, 1);
+			//	partyO1(pIdx, nParties, tParties, setSize, 1);
 				});
 		}
 	}

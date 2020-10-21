@@ -53,6 +53,9 @@
     <ClInclude Include="OtBinMain.v2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gbf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

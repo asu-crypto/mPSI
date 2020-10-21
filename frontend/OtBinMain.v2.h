@@ -23,8 +23,11 @@ using namespace osuCrypto;
 #include <numeric>
 #include <iostream>
 
+
 void Channel_party_test(u64 myIdx, u64 nParties);
 void O1nPSI_Test();
-void GbfTest();
+void party_test();
+//void GbfTest();
+
 
 //void Channel_party_test(u64 myIdx, u64 nParties)

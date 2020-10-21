@@ -5,6 +5,7 @@ using namespace osuCrypto;
 #include "Common/ByteStream.h"
 #define tryCount 2
 
+
 void senderGetLatency(Channel& chl)
 {
 

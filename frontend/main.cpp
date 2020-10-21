@@ -13,6 +13,7 @@ using namespace osuCrypto;
 
 #include <numeric>
 #include "Common/Log.h"
+#include "gbf.h"
 //int miraclTestMain();
 
 
@@ -26,7 +27,8 @@ void usage(const char* argv0)
 }
 int main(int argc, char** argv)
 {
-	GbfTest();
+	//GbfTest();
+	party_test();
 	//O1nPSI_Test();
 	return 0;
 
