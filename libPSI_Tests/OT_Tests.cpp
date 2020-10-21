@@ -63,6 +63,7 @@ void OT_100Receive_Test(BitVector& choiceBits, ArrayView<block> recv, ArrayView<
 
 void BitVector_Indexing_Test_Impl()
 {
+    std::cout << "fsdfsd";
     BitVector bb(128);
     std::vector<bool>gold(128);
 

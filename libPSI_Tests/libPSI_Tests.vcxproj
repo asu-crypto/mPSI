@@ -78,6 +78,7 @@
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="EQ_Tests.cpp" />
     <ClCompile Include="nPSI.cpp" />
+    <ClCompile Include="nPSIv2.cpp" />
     <ClCompile Include="OPPRF_Tests.cpp" />
     <ClCompile Include="OT_Tests.cpp" />
   </ItemGroup>
@@ -87,6 +88,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="EQ_Tests.h" />
     <ClInclude Include="nPSI.h" />
+    <ClInclude Include="nPSIv2.h" />
     <ClInclude Include="OPPRF_Tests.h" />
     <ClInclude Include="OT_Tests.h" />
     <ClInclude Include="ShamirSSScheme_Tests.h" />

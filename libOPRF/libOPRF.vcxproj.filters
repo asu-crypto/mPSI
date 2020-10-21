@@ -60,6 +60,9 @@
     <ClCompile Include="OPPRF\binSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hashing\polyFFT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OPPRF\OPPRFReceiver.h">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OPPRF\EQSender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing\polyFFT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

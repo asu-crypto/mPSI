@@ -24,5 +24,7 @@ using namespace osuCrypto;
 #include <iostream>
 
 void Channel_party_test(u64 myIdx, u64 nParties);
+void O1nPSI_Test();
+void GbfTest();
 
 //void Channel_party_test(u64 myIdx, u64 nParties)

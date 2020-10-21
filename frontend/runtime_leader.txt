@@ -198,3 +198,17 @@ Bandwidth: Send: 0.0798527 Mbps,	 Recv: 0.178165 Mbps
 Total time: 2.817 s
 Total Comm: Send:0.0281181 MB	 Recv: 0.0627365 MB
 ------------------
+=========avg==========
+numParty: 5  numCorrupted: 2  setSize: 32  nTrials:1
+Leader Idx: 4
+#Output Intersection: 16
+#Expected Intersection: 16
+offlineTime:  2985 ms
+hashingTime:  8 ms
+getOPRFTime:  17 ms
+ssClientTime:  0 ms
+ssLeaderTime:  491 ms
+intersection:  0 ms
+onlineTime:  516 ms
+Total time: 3.501 s
+------------------

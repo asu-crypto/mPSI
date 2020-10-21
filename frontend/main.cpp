@@ -26,6 +26,9 @@ void usage(const char* argv0)
 }
 int main(int argc, char** argv)
 {
+	GbfTest();
+	//O1nPSI_Test();
+	return 0;
 
 	//myCuckooTest_stash();
 	//Table_Based_Random_Test();
@@ -47,6 +50,8 @@ int main(int argc, char** argv)
 
 	u64 roundOPPRF;
 
+	OPPRFnt_EmptrySet_Test_Main();
+	return 0;
 
 	switch (argc) {
 	case 2: //unit test
