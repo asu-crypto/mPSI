@@ -27,9 +27,11 @@ void usage(const char* argv0)
 }
 int main(int argc, char** argv)
 {
+	InitDebugPrinting();
 	//GbfTest();
-	party_test();
-	//O1nPSI_Test();
+	//party_test();
+	O1nPSI_Test();
+
 	return 0;
 
 	//myCuckooTest_stash();

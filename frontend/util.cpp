@@ -76,3 +76,37 @@ void recverGetLatency(Channel& chl)
     chl.asyncSend(dummy, 1);
 
 }
+
+
+#include <fstream>
+#include <cassert> 
+
+using namespace osuCrypto;
+
+static std::fstream* file = nullptr;
+std::string SolutionDir = "../../";
+
+void InitDebugPrinting(std::string filePath)
+{
+    std::cout << "changing sink" << std::endl;
+
+    if (file == nullptr)
+    {
+        file = new std::fstream;
+    }
+    else
+    {
+        file->close();
+    }
+
+    file->open(filePath, std::ios::trunc | std::ofstream::out);
+
+    if (!file->is_open())
+        throw std::exception();
+
+    time_t now = time(0);
+
+    std::cout.rdbuf(file->rdbuf());
+    std::cerr.rdbuf(file->rdbuf());
+    //SetSink(*file); 
+}

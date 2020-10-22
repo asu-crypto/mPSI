@@ -16,7 +16,9 @@ inline void GbfEncode(const std::vector<std::pair<block, block>> key_values, std
 
 	u64 setSize = key_values.size();
 	u64 mBfBitCount = 60 * setSize;
-	garbledBF.resize(mBfBitCount);
+	garbledBF.resize(mBfBitCount,ZeroBlock);
+	PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
+
 
 	std::vector<std::set<u64>> idxs(setSize);
 	for (u64 i = 0; i < setSize; ++i)
@@ -69,6 +71,16 @@ inline void GbfEncode(const std::vector<std::pair<block, block>> key_values, std
 		//std::cout << test << "\n";
 		//std::cout << "sender " << i << " *   " << garbledBF[firstFreeIdx] << "    " << firstFreeIdx << std::endl;
 	}
+
+	//filling random for the rest
+	for (u64 i = 0; i < garbledBF.size(); ++i)
+		if (eq(garbledBF[i], ZeroBlock))
+			garbledBF[i] = prng.get<block>();
+
+	/*std::cout << IoStream::lock;
+	for (u64 i = 0; i < 5; i++)
+		std::cout << garbledBF[i] << " - GbfEncode - " << i << std::endl;
+	std::cout << IoStream::unlock;*/
 }
 
 inline  void GbfEncode(const std::vector<block> setKeys, const std::vector<block> setValues, std::vector<block>& garbledBF)
@@ -80,7 +92,7 @@ inline  void GbfEncode(const std::vector<block> setKeys, const std::vector<block
 		memcpy((u8*)&key_values[i].first, (u8*)&setKeys[i], sizeof(block));
 		memcpy((u8*)&key_values[i].second, (u8*)&setValues[i], sizeof(block));
 	}
-	std::cout << setValues[0] << " vs " << key_values[0].second << "\n";
+	//std::cout << setValues[0] << " vs " << key_values[0].second << "\n";
 
 	GbfEncode(key_values, garbledBF);
 }
@@ -131,6 +143,7 @@ inline void GbfTest()
 	std::vector<std::pair<block, block>> key_values(128);
 	std::vector<block> setKeys(128);
 	std::vector<block> setValues(128);
+	std::vector<block> setValuesOut(128);
 
 	for (u64 i = 0; i < key_values.size(); ++i)
 	{
@@ -143,8 +156,19 @@ inline void GbfTest()
 	std::vector<block> garbledBF;
 	//GbfEncode(key_values, garbledBF);
 	GbfEncode(setKeys, setValues, garbledBF);
-	GbfDecode(garbledBF, setKeys, setValues);
 
-	std::cout << setValues[0] << " vs " << key_values[0].second << "\n";
+	for (size_t i = 0; i < 10; i++)
+		std::cout << garbledBF[i] << "\n";
+	
+
+
+	GbfDecode(garbledBF, setKeys, setValuesOut);
+
+	for (size_t i = 0; i < 128; i++)
+	{
+		if(setValues[i]!= setValuesOut[i])
+			std::cout << setValues[i] << " vs " << setValuesOut[i] << "\n";
+
+	}
 
 }
