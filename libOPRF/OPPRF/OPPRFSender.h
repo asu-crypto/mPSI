@@ -80,8 +80,10 @@ namespace osuCrypto
 		void recvSSPolyBased(u64 IdxTheirParty, binSet& bins, std::vector<block>& plaintexts, const std::vector<Channel*>& chls);
 		void recvFullPolyBased(u64 IdxTheirParty, binSet& bins, std::vector<block>& plaintexts, const std::vector<Channel*>& chls);
 		void recvBFBased(u64 IdxTheirParty, binSet& bins, std::vector<block>& plaintexts, const std::vector<Channel*>& chls);
+		
+		void getOPRFkeysfor2PSI(u64 IdxTheirParty, binSet& bins, const std::vector<Channel*>& chls, bool isOtherDirectionGetOPRF = false);
 
-
+		void sendLastPSIMessage(u64 IdxTheirParty, binSet& bins, const std::vector<Channel*>& chls);
     };
 
 }

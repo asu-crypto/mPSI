@@ -1202,7 +1202,7 @@ void party2(u64 myIdx, u64 setSize)
 		{
 			if (!memcmp((u8*)&sendPayLoads[i], &recvPayLoads[i], maskSize))
 			{
-				//	mIntersection.push_back(i);
+				mIntersection.push_back(i);
 			}
 		}
 		Log::out << "mIntersection.size(): " << mIntersection.size() << Log::endl;
@@ -2801,7 +2801,7 @@ void OPPRF3_EmptrySet_Test_Main()
 
 void OPPRF2_EmptrySet_Test_Main()
 {
-	u64 setSize = 1 << 20, psiSecParam = 40, bitSize = 128;
+	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128;
 	PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 	mSet.resize(setSize);
 	for (u64 i = 0; i < setSize; ++i)

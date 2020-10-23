@@ -27,6 +27,10 @@ namespace osuCrypto
 	{ { 1.5,0.17 },{ 3,2 },{ 27,64 },{ 5,6 } };
 
 
+	SimpleParam1 knSimpleParamNoStash
+	{ { 1.3,0.17 },{ 3,2 },{ 27,64 },{ 5,6 } };
+
+
 	SimpleHasher1::SimpleHasher1()
 	{
 	}
@@ -166,7 +170,7 @@ namespace osuCrypto
 		return std::log(bins * std::pow(balls * exp(1) / (bins * k), k)) / std::log(2);
 	}
 
-	void SimpleHasher1::init(u64 n,u64 opt)
+	void SimpleHasher1::init(u64 n,u64 opt, bool noStash)
 	{	
 		mN = n;
 
@@ -186,6 +190,9 @@ namespace osuCrypto
 			mParams = k2n24s40SimpleParam1;
 		else
 			throw std::runtime_error("not implemented");
+
+		if(noStash==1)
+			mParams = knSimpleParamNoStash;
 
 		if (opt == 0)
 		{
@@ -260,7 +267,7 @@ namespace osuCrypto
 		
 
 	}
-	
+
 	void SimpleHasher1::insertBatch(ArrayView<u64> inputIdxs, MatrixView<u64> hashs)
 	{
 		for (u64 j = 0; j < inputIdxs.size(); ++j)

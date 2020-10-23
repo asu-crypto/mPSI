@@ -65,12 +65,13 @@ namespace osuCrypto
 
 		u64 maxRealBinSize();
 
-		void init(u64 n, u64 opt);
+		void init(u64 n, u64 opt, bool noStash = 0);
 
 		void insertBatch(
 			ArrayView<u64> inputIdxs,
 			MatrixView<u64> hashs);
 
+		
 		//void preHashedInsertItems(ArrayView<block> items, u64 itemIdx);
 		//void insertItemsWithPhasing(ArrayView<block> items, u64 itemIdx);
 	};

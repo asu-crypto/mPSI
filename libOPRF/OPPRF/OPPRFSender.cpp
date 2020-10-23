@@ -1976,6 +1976,205 @@ namespace osuCrypto
 
 	}
 
+
+
+	void  OPPRFSender::getOPRFkeysfor2PSI(u64 IdxP, binSet& bins, const std::vector<Channel*>& chls, bool isOtherDirectionGetOPRF)
+	{
+
+		//std::vector<std::thread>  thrds(chls.size());
+		std::vector<std::thread>  thrds(1);
+
+		gTimer.setTimePoint("online.send.spaw");
+
+
+		for (u64 tIdx = 0; tIdx < thrds.size(); ++tIdx)
+		{
+			auto seed = mPrng.get<block>();
+			thrds[tIdx] = std::thread([&, tIdx, seed]() {
+
+				PRNG prng(seed);
+
+				if (tIdx == 0) gTimer.setTimePoint("online.send.thrdStart");
+
+
+				auto& chl = *chls[tIdx];
+
+				if (tIdx == 0) gTimer.setTimePoint("online.send.insert");
+				const u64 stepSize = 16;
+
+				std::vector<block> ncoInput(bins.mNcoInputBlkSize);
+
+#if 1
+#pragma region compute Send Bark-OPRF				
+				//####################
+				//#######Sender role
+				//####################
+				auto& otSend = *mOtSends[tIdx];
+				auto otCountSend = bins.mSimpleBins.mBins.size();
+
+				auto binStart = tIdx * otCountSend / thrds.size();
+				auto binEnd = (tIdx + 1) * otCountSend / thrds.size();
+
+				if (tIdx == 0) gTimer.setTimePoint("online.send.OT");
+
+				for (u64 bIdx = binStart; bIdx < binEnd;)
+				{
+					u64 currentStepSize = std::min(stepSize, binEnd - bIdx);
+					otSend.recvCorrection(chl, currentStepSize);
+
+					for (u64 stepIdx = 0; stepIdx < currentStepSize; ++bIdx, ++stepIdx)
+					{
+
+						auto& bin = bins.mSimpleBins.mBins[bIdx];
+
+						if (bin.mIdx.size() > 0)
+						{
+							bin.mValOPRF[IdxP].resize(bin.mIdx.size());
+							//std::cout << "s-" << inputIdx << ", ";
+							for (u64 i = 0; i < bin.mIdx.size(); ++i)
+							{
+
+								u64 inputIdx = bin.mIdx[i];
+
+								for (u64 j = 0; j < bins.mNcoInputBlkSize; ++j)
+								{
+									ncoInput[j] = bins.mNcoInputBuff[j][inputIdx];
+								}
+
+								//    block sendMask;
+
+								otSend.encode(
+									bIdx, //each bin has 1 OT
+									ncoInput,
+									bin.mValOPRF[IdxP][i]);
+								//mmOPRF[inputIdx][i]);
+								/*if (inputIdx < 3 || (inputIdx < mN && inputIdx > mN - 2))
+								std::cout << "s-"<<inputIdx <<", "<< inputIdx << ": " << sendMask << std::endl;*/
+							}
+						}
+					}
+				}
+
+
+				if (tIdx == 0) gTimer.setTimePoint("online.send.otSend.finalOPRF");
+
+#ifdef PRINT
+				std::cout << "getPosTime" << IdxP << ": " << mPosBitsTime / pow(10, 6) << std::endl;
+#endif // PRINT
+
+
+#pragma endregion
+#endif
+
+#if 1
+#pragma region compute Recv Bark-OPRF
+
+				//####################
+				//#######Receiver role
+				//####################
+				if (isOtherDirectionGetOPRF) {
+					auto& otRecv = *mOtRecvs[tIdx];
+					auto otCountRecv = bins.mCuckooBins.mBins.size();
+					// get the region of the base OTs that this thread should do.
+					binStart = tIdx * otCountRecv / thrds.size();
+					binEnd = (tIdx + 1) * otCountRecv / thrds.size();
+
+					for (u64 bIdx = binStart; bIdx < binEnd;)
+					{
+						u64 currentStepSize = std::min(stepSize, binEnd - bIdx);
+
+						for (u64 stepIdx = 0; stepIdx < currentStepSize; ++bIdx, ++stepIdx)
+						{
+
+							auto& bin = bins.mCuckooBins.mBins[bIdx];
+
+							if (!bin.isEmpty())
+							{
+								u64 inputIdx = bin.idx();
+
+								for (u64 j = 0; j < ncoInput.size(); ++j)
+									ncoInput[j] = bins.mNcoInputBuff[j][inputIdx];
+
+								otRecv.encode(
+									bIdx,      // input
+									ncoInput,             // input
+									bin.mValOPRF[IdxP]); // output
+
+														 /*if (inputIdx < 3 || (inputIdx < mN && inputIdx > mN-2))
+														 std::cout << "r-" << inputIdx << ", " << inputIdx << ": " << valOPRF[inputIdx] << std::endl;*/
+							}
+							else
+							{
+								otRecv.zeroEncode(bIdx);
+							}
+						}
+						otRecv.sendCorrection(chl, currentStepSize);
+					}
+
+					if (tIdx == 0) gTimer.setTimePoint("online.send.otRecv.finalOPRF");
+
+					otRecv.check(chl);
+				}
+#pragma endregion
+#endif
+				otSend.check(chl);
+
+				});
+		}
+
+		for (auto& thrd : thrds)
+			thrd.join();
+	}
+
+	void OPPRFSender::sendLastPSIMessage(u64 IdxTheirParty, binSet& bins, const std::vector<Channel*>& chls)
+	{
+		uPtr<Buff> sendMaskBuff1(new Buff);
+		sendMaskBuff1->resize(bins.mMaskSize * mN);
+		auto maskView1 = sendMaskBuff1->getMatrixView<u8>(bins.mMaskSize);
+
+		uPtr<Buff> sendMaskBuff2(new Buff);
+		sendMaskBuff2->resize(bins.mMaskSize * mN);
+		auto maskView2 = sendMaskBuff2->getMatrixView<u8>(bins.mMaskSize);		
+		
+		uPtr<Buff> sendMaskBuff3(new Buff);
+		sendMaskBuff3->resize(bins.mMaskSize * mN);
+		auto maskView3 = sendMaskBuff3->getMatrixView<u8>(bins.mMaskSize);
+
+
+		std::vector<u64> cnt(3,0);
+		std::cout <<"bins.mSimpleBins.mBins.size()= " << bins.mSimpleBins.mBins.size() << std::endl;
+
+		for (int idxBin = 0; idxBin < bins.mSimpleBins.mBins.size(); idxBin++) //forall bins
+		{
+			if (bins.mSimpleBins.mBins[idxBin].mIdx.size() > 0)
+			{
+				std::cout << "bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty].size()= " << bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty].size() << std::endl;
+
+				for (int i = 0; i < bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty].size(); i++) //forall oprf in bin interacted with  idxParty 
+				{
+
+					auto hIdx = bins.mSimpleBins.mBins[idxBin].hIdx[i];
+					if (hIdx < 3 && cnt[hIdx]< mN) //for no stash bin, we only use 3 hash functions
+					{
+						std::cout << hIdx << " -   c_idx=" << cnt[hIdx] << "  mValOPRF=" << bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty][i] << std::endl;
+						
+						if (hIdx == 0)
+								memcpy(maskView1[cnt[hIdx]].data(), (u8*)&bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty][i], bins.mMaskSize);
+							else if (hIdx == 1)
+								memcpy(maskView2[cnt[hIdx]].data(), (u8*)&bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty][i], bins.mMaskSize);
+							else if (hIdx == 2)
+								memcpy(maskView3[cnt[hIdx]].data(), (u8*)&bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty][i], bins.mMaskSize);
+						
+						cnt[hIdx]++;
+					}
+				}
+			}
+		}
+		auto& chl = *chls[0];
+		chl.asyncSend(std::move(sendMaskBuff1));
+		chl.asyncSend(std::move(sendMaskBuff2));
+		chl.asyncSend(std::move(sendMaskBuff3));
+	}
 }
 
 

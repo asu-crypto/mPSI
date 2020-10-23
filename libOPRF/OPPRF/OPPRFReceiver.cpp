@@ -1968,4 +1968,224 @@ namespace osuCrypto
 
 
 	}
+
+
+	void  OPPRFReceiver::getOPRFkeysfor2PSI(u64 IdxP, binSet& bins, const std::vector<Channel*>& chls, bool isOtherDirectionGetOPRF)
+	{
+#if 1
+		// this is the online phase.
+		gTimer.setTimePoint("online.recv.start");
+
+
+		std::vector<std::thread>  thrds(chls.size());
+		//  std::vector<std::thread>  thrds(1);
+
+		// fr each thread, spawn it.
+		for (u64 tIdx = 0; tIdx < thrds.size(); ++tIdx)
+		{
+			auto seed = mPrng.get<block>();
+			thrds[tIdx] = std::thread([&, tIdx, seed]()
+				{
+
+					if (tIdx == 0) gTimer.setTimePoint("online.recv.thrdStart");
+
+
+
+					auto& chl = *chls[tIdx];
+
+					if (tIdx == 0) gTimer.setTimePoint("online.recv.insertDone");
+
+					const u64 stepSize = 16;
+
+					std::vector<block> ncoInput(bins.mNcoInputBlkSize);
+
+#if 1
+#pragma region compute Recv Bark-OPRF
+
+					//####################
+					//#######Recv role
+					//####################
+					auto& otRecv = *mOtRecvs[tIdx];
+
+					auto otCountRecv = bins.mCuckooBins.mBins.size();
+					// get the region of the base OTs that this thread should do.
+					auto binStart = tIdx * otCountRecv / thrds.size();
+					auto binEnd = (tIdx + 1) * otCountRecv / thrds.size();
+
+					for (u64 bIdx = binStart; bIdx < binEnd;)
+					{
+						u64 currentStepSize = std::min(stepSize, binEnd - bIdx);
+
+						for (u64 stepIdx = 0; stepIdx < currentStepSize; ++bIdx, ++stepIdx)
+						{
+							auto& bin = bins.mCuckooBins.mBins[bIdx];
+
+							if (!bin.isEmpty())
+							{
+								u64 inputIdx = bin.idx();
+
+								for (u64 j = 0; j < ncoInput.size(); ++j)
+									ncoInput[j] = bins.mNcoInputBuff[j][inputIdx];
+
+								otRecv.encode(
+									bIdx,      // input
+									ncoInput,             // input
+									bin.mValOPRF[IdxP]); // output
+							}
+							else
+								otRecv.zeroEncode(bIdx);
+						}
+						otRecv.sendCorrection(chl, currentStepSize);
+					}
+
+					if (tIdx == 0) gTimer.setTimePoint("online.recv.otRecv.finalOPRF");
+
+
+
+#pragma endregion
+#endif
+
+#if 1
+#pragma region compute Send Bark-OPRF				
+					//####################
+					//#######Sender role
+					//####################
+					if (isOtherDirectionGetOPRF) {
+						auto& otSend = *mOtSends[tIdx];
+						auto otCountSend = bins.mSimpleBins.mBins.size();
+
+						binStart = tIdx * otCountSend / thrds.size();
+						binEnd = (tIdx + 1) * otCountSend / thrds.size();
+
+
+						if (tIdx == 0) gTimer.setTimePoint("online.send.OT");
+
+						for (u64 bIdx = binStart; bIdx < binEnd;)
+						{
+							u64 currentStepSize = std::min(stepSize, binEnd - bIdx);
+							otSend.recvCorrection(chl, currentStepSize);
+
+							for (u64 stepIdx = 0; stepIdx < currentStepSize; ++bIdx, ++stepIdx)
+							{
+
+								auto& bin = bins.mSimpleBins.mBins[bIdx];
+
+								if (bin.mIdx.size() > 0)
+								{
+									bin.mValOPRF[IdxP].resize(bin.mIdx.size());
+
+									//std::cout << "s-" << bIdx << ", ";
+									for (u64 i = 0; i < bin.mIdx.size(); ++i)
+									{
+
+										u64 inputIdx = bin.mIdx[i];
+
+										for (u64 j = 0; j < mNcoInputBlkSize; ++j)
+										{
+											ncoInput[j] = bins.mNcoInputBuff[j][inputIdx];
+										}
+
+										otSend.encode(
+											bIdx, //each bin has 1 OT
+											ncoInput,
+											bin.mValOPRF[IdxP][i]);
+
+									}
+								}
+							}
+						}
+						if (tIdx == 0) gTimer.setTimePoint("online.send.otSend.finalOPRF");
+						otSend.check(chl);
+					}
+#pragma endregion
+#endif
+					otRecv.check(chl);
+				});
+		}
+
+		// join the threads.
+		for (u64 tIdx = 0; tIdx < thrds.size(); ++tIdx)
+			thrds[tIdx].join();
+
+		gTimer.setTimePoint("online.recv.exit");
+
+		//std::cout << gTimer;
+#endif
+	}
+
+	void OPPRFReceiver::compute2PSI(u64 IdxTheirParty, binSet& bins, const std::vector<Channel*>& chls)
+	{
+		//std::unordered_map<u64, std::pair<block, u64>> localMasks(bins.mN);
+
+		std::array<std::unordered_map<u64, std::pair<block, u64>>, 3> localMasks; //for hash 0/1/2
+		localMasks[0].reserve(bins.mN);//for hash 0
+		localMasks[1].reserve(bins.mN);//for hash 1
+		localMasks[2].reserve(bins.mN);//for hash 2
+
+		for (int idxBin = 0; idxBin < bins.mCuckooBins.mBins.size(); idxBin++) //forall bins
+		{
+
+			if (!bins.mCuckooBins.mBins[idxBin].isEmpty())
+			{
+				auto hIdx = bins.mCuckooBins.mBins[idxBin].hashIdx();
+				localMasks[hIdx].emplace(*(u64*)&bins.mCuckooBins.mBins[idxBin].mValOPRF[IdxTheirParty]
+					, std::pair<block, u64>(bins.mCuckooBins.mBins[idxBin].mValOPRF[IdxTheirParty], bins.mCuckooBins.mBins[idxBin].idx()));
+			}
+		}
+
+		auto& chl = *chls[0];
+		
+		for (u64 hIdx = 0; hIdx < 3; hIdx++)
+		{
+			ByteStream maskBuffer;
+			chl.recv(maskBuffer);
+			auto maskBFView = maskBuffer.getMatrixView<u8>(bins.mMaskSize);
+
+
+			if (bins.mMaskSize >= sizeof(u64)) //unordered_map only work for key >= 64 bits. i.e. setsize >=2^12
+			{
+				for (u64 k = 0; k < bins.mN; ++k)
+				{
+					u64 shortcut;
+					memcpy((u8*)&shortcut, maskBFView[k].data(), sizeof(u64));
+
+
+				//	auto& msk = *(u64*)&(maskBFView[k]).data();
+				//	auto& blk = *(block*)&(maskBFView[k]);
+
+					std::cout <<k << " - " << toBlock(shortcut) << " maskBFView\n";
+					// check 64 first bits
+					auto match = localMasks[hIdx].find(shortcut);
+
+					//if match, check for whole bits
+					if (match != localMasks[hIdx].end())
+					{
+						if (memcmp(maskBFView[k].data(), &match->second.first, bins.mMaskSize) == 0) // check full mask
+						{
+							
+								mIntersection.push_back(match->second.second);
+						}
+					}
+				}
+			}
+			else //for small set, do O(n^2) check
+			{
+				for (u64 k = 0; k < bins.mN; ++k)
+				{
+
+					for (auto match = localMasks[hIdx].begin(); match != localMasks[hIdx].end(); ++match)
+					{
+						if (memcmp(maskBFView[k].data(), &match->second.first, bins.mMaskSize) == 0) // check full mask
+						{
+							mIntersection.push_back(match->second.second);
+						}
+					}
+				}
+			}
+
+		}
+
+
+	}
+
 }

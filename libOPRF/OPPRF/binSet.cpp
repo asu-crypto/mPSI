@@ -23,7 +23,7 @@ namespace osuCrypto
     {
     }
 
-    void binSet::init( u64 myIdx, u64 nParties, u64 setSize, u64 statSecParam, u64 opt)
+    void binSet::init( u64 myIdx, u64 nParties, u64 setSize, u64 statSecParam, u64 opt, bool noStash)
     {
 		mMyIdx = myIdx;
 		mParties = nParties;
@@ -43,8 +43,8 @@ namespace osuCrypto
 		std::vector<OPPRFReceiver> mOpprfRecvs(3);*/
 		
 		
-			mSimpleBins.init(mN, mOpt);
-			mCuckooBins.init(mN, mOpt);
+			mSimpleBins.init(mN, mOpt, noStash);
+			mCuckooBins.init(mN, mOpt, noStash);
     }
 
 	void binSet::hashing2Bins(std::vector<block>& inputs, int numThreads)
@@ -264,5 +264,17 @@ namespace osuCrypto
 #endif
     }
 
-	
+
+	void binSet::allOPRFs(u64 idxParty)
+	{
+		mAllOPRFsSimpleHashing.resize(mMaskSize * mSimpleBins.mParams.mNumHashes[0] * mN);
+		
+		for (int idxBin = 0; idxBin < mSimpleBins.mBins.size(); idxBin++) //forall bins
+			for (int i = 0; i < mSimpleBins.mBins[idxBin].mValOPRF[idxParty].size(); i++) //forall oprf in bin interacted with  idxParty 
+			{
+				memcpy(mAllOPRFsSimpleHashing.data()+i* mMaskSize
+					, (u8*)&mSimpleBins.mBins[idxBin].mValOPRF[idxParty][i], mMaskSize);
+			}
+	}
+
 }

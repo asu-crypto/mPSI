@@ -31,6 +31,11 @@ namespace osuCrypto
     CuckooParam1 k2n08s40CuckooParam1
 	{ { 1.17,0.15 },{ 3,2 },{ 27,63 } };
 
+    
+
+       CuckooParam1 knCuckooParamNoStash
+       { { 1.3,0.17 },{ 3,2 },{ 27,64 } };
+
     // not sure if this needs a stash of 40, but should be safe enough.
     CuckooParam1 k2n07s40CuckooParam1
 	{ { 1.5,0.17 },{ 3,2 },{ 27,64 } };
@@ -144,7 +149,7 @@ namespace osuCrypto
 
     }
 
-    void CuckooHasher1::init(u64 n,u64 opt)
+    void CuckooHasher1::init(u64 n,u64 opt, bool noStash)
     {
 
        // if (statSecParam != 40) throw std::runtime_error("not implemented");
@@ -167,6 +172,9 @@ namespace osuCrypto
 			else
 				throw std::runtime_error("not implemented");
 		
+            if (noStash == 1)
+                mParams = knCuckooParamNoStash;
+
 			if (opt == 0)
 			{
 				mParams.mSenderBinSize[0] = std::pow(2, std::ceil(std::log2(mParams.mSenderBinSize[0])));;

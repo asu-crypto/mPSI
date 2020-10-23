@@ -72,6 +72,9 @@ namespace osuCrypto
 		void sendBFBased(u64 IdxTheirParty, binSet& bins, std::vector<block>& plaintexts, const std::vector<Channel*>& chls);
 
 
+		void getOPRFkeysfor2PSI(u64 IdxTheirParty, binSet& bins, const std::vector<Channel*>& chls, bool isOtherDirectionGetOPRF = false);
+
+		void compute2PSI(u64 IdxTheirParty, binSet& bins, const std::vector<Channel*>& chls);
 
     };
 
