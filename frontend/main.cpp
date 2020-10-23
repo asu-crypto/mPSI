@@ -30,8 +30,8 @@ int main(int argc, char** argv)
 	InitDebugPrinting();
 	//GbfTest();
 	//party_test();
-	party2psi_Test_Main();
-	//O1nPSI_Test();
+	//party2psi_Test_Main();
+	O1nPSI_Test();
 
 	return 0;
 

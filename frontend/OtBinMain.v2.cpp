@@ -322,6 +322,9 @@ void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 type_secur
 	PRNG prng(_mm_set_epi32(4253465, 3434565, myIdx, myIdx));
 	u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
 	
+	
+
+
 	if (type_okvs == GbfOkvs)
 		okvsTableSize= 60 * setSize;
 
@@ -379,6 +382,7 @@ void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 type_secur
 
 	std::vector<block> inputSet2PSI(setSize); //for party n-1 and n
 
+
 	//====================================
 	//============sending aes keys========
 	if (myIdx == 0) 
@@ -404,7 +408,6 @@ void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 type_secur
 		std::cout << IoStream::unlock;*/
 	}
 
-#if 1
 	//====================================
 	//============compute encoding========
 
@@ -477,10 +480,93 @@ void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 type_secur
 		std::cout << IoStream::unlock;
 	}
 
+	//====================================
+	//============compute 2psi========
+
+	if (myIdx == party_n1 || myIdx == party_n) //for 2psi
+	{
+		std::vector<KkrtNcoOtReceiver> otRecv(2);
+		std::vector<KkrtNcoOtSender> otSend(2);
+		OPPRFSender send;
+		OPPRFReceiver recv;
+		binSet bins;
+
+		bins.init(myIdx, 2, setSize, psiSecParam, 1, 1);
+		//	bins.mMaskSize = 8;
+		u64 otCountSend = bins.mSimpleBins.mBins.size();
+		u64 otCountRecv = bins.mCuckooBins.mBins.size();
+
+		if (myIdx == party_n1) {
+			//I am a sender -> party_n
+			send.init(bins.mOpt, 2, setSize, psiSecParam, bitSize, chls[party_n], otCountSend, otSend[1], otRecv[1], prng.get<block>(), false);
+
+		}
+		else if (myIdx == party_n) {
+			//I am a recv <-party_n1
+			recv.init(bins.mOpt, 2, setSize, psiSecParam, bitSize, chls[party_n1], otCountRecv, otRecv[0], otSend[0], ZeroBlock, false);
+		}
 
 
-#endif
+		//##########################
+		//### Hashing
+		//##########################
+		bins.hashing2Bins(inputSet2PSI, 1);
 
+
+		if (myIdx == party_n1) {
+			//I am a sender to my next neigbour
+			send.getOPRFkeysfor2PSI(1, bins, chls[party_n], false);
+			send.sendLastPSIMessage(1, bins, chls[party_n]);
+
+		}
+		else if (myIdx == party_n) {
+			//I am a recv to my previous neigbour
+			recv.getOPRFkeysfor2PSI(0, bins, chls[party_n1], false);
+			recv.compute2PSI(0, bins, chls[party_n1]);
+		}
+
+
+
+
+
+
+		//std::cout << IoStream::lock;
+		//if (myIdx == 0) //sender
+		//{
+		//	for (int i = 0; i < bins.mSimpleBins.mBins[0].mValOPRF[1].size(); i++)
+		//	{
+
+		//		std::cout << bins.mSimpleBins.mBins[0].mValOPRF[1][i] << std::endl;
+		//		//Log::out << recvPayLoads[2][i] << Log::endl;
+		//	}
+		//	std::cout << "------------" << std::endl;
+		//}
+		//if (myIdx == 1)
+		//{
+		//	std::cout << bins.mCuckooBins.mBins[0].mValOPRF[0] << std::endl;
+
+		//	//for (int i = 0; i < bins.mCuckooBins.mBins[0].mValOPRF[0].size(); i++)
+		//	//{
+		//	//	//Log::out << recvPayLoads[i] << Log::endl;
+		//	//	std::cout << sendPayLoads[i] << std::endl;
+		//	//}
+		//}
+		//std::cout << IoStream::unlock;
+
+
+		//##########################
+		//### online phasing - compute intersection
+		//##########################
+
+		if (myIdx == party_n) {
+			Log::out << "mIntersection.size(): " << recv.mIntersection.size() << Log::endl;
+			for (u64 i = 0; i < recv.mIntersection.size(); ++i)
+			{
+				std::cout << recv.mIntersection[i] << " - " << inputSet[recv.mIntersection[i]] << std::endl;
+
+			}
+		}
+	}
 
 
 	//close chanels 
@@ -499,7 +585,7 @@ void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 type_secur
 
 void O1nPSI_Test()
 {
-	u64 setSize = 1 << 3, psiSecParam = 40, bitSize =128, nParties = 5;
+	u64 setSize = 1 << 8, psiSecParam = 40, bitSize =128, nParties = 5;
 
 	std::vector<std::thread>  pThrds(nParties);
 	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
