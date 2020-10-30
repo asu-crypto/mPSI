@@ -93,6 +93,7 @@
     <ClInclude Include="bitPosition.h" />
     <ClInclude Include="CLP.h" />
     <ClInclude Include="gbf.h" />
+    <ClInclude Include="o1party.h" />
     <ClInclude Include="OtBinMain.h" />
     <ClInclude Include="OtBinMain.v2.h" />
     <ClInclude Include="util.h" />
