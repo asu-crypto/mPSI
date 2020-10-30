@@ -14,6 +14,7 @@ using namespace osuCrypto;
 #include <numeric>
 #include "Common/Log.h"
 #include "gbf.h"
+#include "o1party.h"
 //int miraclTestMain();
 
 
@@ -29,7 +30,8 @@ int main(int argc, char** argv)
 {
 	InitDebugPrinting();
 	//GbfTest();
-	//party_test();
+	//PolyTest();
+	//party_test(PolyOkvs);
 	//party2psi_Test_Main();
 	O1nPSI_Test();
 

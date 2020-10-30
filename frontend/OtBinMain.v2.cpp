@@ -339,7 +339,8 @@ void O1nPSI_Test()
 		pThrds[pIdx] = std::thread([&, pIdx]() {
 			//Channel_party_test(pIdx, nParties);
 			//partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
-			partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
+			//partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
+			partyO1(pIdx, nParties, setSize,PolyOkvs, secSemiHonest);
 			});
 	}
 

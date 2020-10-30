@@ -4,6 +4,11 @@
 #include "Common/Log.h"
 #include "Common/Log1.h"
 #include <set>
+#include "Hashing/polyFFT.h"
+#include <NTL/ZZ_p.h>
+#include <NTL/vec_ZZ_p.h>
+#include <NTL/ZZ_pX.h>
+#include <NTL/ZZ.h>
 
 using namespace osuCrypto;
 
@@ -54,22 +59,22 @@ inline void GbfEncode(const std::vector<std::pair<block, block>> key_values, std
 				else
 				{
 					garbledBF[idx] = _mm_set_epi64x(idx, idx);
-					//	std::cout << garbledBF[idx] <<"\n";
+					//	std::cout << coefficients[idx] <<"\n";
 					sum = sum ^ garbledBF[idx];
-					//std::cout << idx << " " << garbledBF[idx] << std::endl;
+					//std::cout << idx << " " << coefficients[idx] << std::endl;
 				}
 			}
 			else
 			{
 				sum = sum ^ garbledBF[idx];
-				//std::cout << idx << " " << garbledBF[idx] << std::endl;
+				//std::cout << idx << " " << coefficients[idx] << std::endl;
 			}
 		}
 
 		garbledBF[firstFreeIdx] = sum ^ key_values[i].second;
-		//std::cout << firstFreeIdx << " " << garbledBF[firstFreeIdx] << std::endl;
+		//std::cout << firstFreeIdx << " " << coefficients[firstFreeIdx] << std::endl;
 		//std::cout << test << "\n";
-		//std::cout << "sender " << i << " *   " << garbledBF[firstFreeIdx] << "    " << firstFreeIdx << std::endl;
+		//std::cout << "sender " << i << " *   " << coefficients[firstFreeIdx] << "    " << firstFreeIdx << std::endl;
 	}
 
 	//filling random for the rest
@@ -79,7 +84,7 @@ inline void GbfEncode(const std::vector<std::pair<block, block>> key_values, std
 
 	/*std::cout << IoStream::lock;
 	for (u64 i = 0; i < 5; i++)
-		std::cout << garbledBF[i] << " - GbfEncode - " << i << std::endl;
+		std::cout << coefficients[i] << " - GbfEncode - " << i << std::endl;
 	std::cout << IoStream::unlock;*/
 }
 
@@ -126,7 +131,7 @@ inline  void GbfDecode(const std::vector<block> garbledBF, const std::vector<blo
 		setValues[i] = ZeroBlock;
 		for (auto idx : idxs)
 		{
-			///std::cout << idx << " " << garbledBF[idx] << std::endl;
+			///std::cout << idx << " " << coefficients[idx] << std::endl;
 			setValues[i] = setValues[i] ^ garbledBF[idx];
 		}
 
@@ -138,6 +143,8 @@ inline  void GbfDecode(const std::vector<block> garbledBF, const std::vector<blo
 
 inline void GbfTest()
 {
+	std::cout << " ============== GbfTest ==============\n";
+
 	PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 
 	std::vector<std::pair<block, block>> key_values(128);
@@ -154,11 +161,11 @@ inline void GbfTest()
 	}
 
 	std::vector<block> garbledBF;
-	//GbfEncode(key_values, garbledBF);
+	//GbfEncode(key_values, coefficients);
 	GbfEncode(setKeys, setValues, garbledBF);
 
-	for (size_t i = 0; i < 10; i++)
-		std::cout << garbledBF[i] << "\n";
+	/*for (size_t i = 0; i < 10; i++)
+		std::cout << garbledBF[i] << "\n";*/
 	
 
 
@@ -170,5 +177,124 @@ inline void GbfTest()
 			std::cout << setValues[i] << " vs " << setValuesOut[i] << "\n";
 
 	}
+	std::cout << " ============== done ==============\n";
+
+}
+
+
+inline void PolyEncode(const std::vector<std::pair<block, block>> key_values, std::vector<block>& coefficents)
+{
+	ZZ_pX Polynomial;
+	ZZ mPrime = to_ZZ("340282366920938463463374607431768211507"); //nextprime(2^128)
+	ZZ_p::init(ZZ(mPrime));
+
+	u64 degree = key_values.size() - 1; //2%
+	coefficents.resize(degree + 1);
+
+	ZZ_p* zzX = new ZZ_p[key_values.size()];
+	ZZ_p* zzY = new ZZ_p[key_values.size()];
+	ZZ zz;
+	ZZ_pX* M = new ZZ_pX[degree * 2 + 1];;
+	ZZ_p* a = new ZZ_p[degree + 1];;
+	ZZ_pX* temp = new ZZ_pX[degree * 2 + 1];
+
+	for (u64 idx = 0; idx < key_values.size(); idx++)
+	{
+		ZZFromBytes(zz, (u8*)&key_values[idx].first, sizeof(block));
+		zzX[idx] = to_ZZ_p(zz);
+
+		ZZFromBytes(zz, (u8*)&key_values[idx].second, sizeof(block));
+		zzY[idx] = to_ZZ_p(zz);
+	}
+	prepareForInterpolate(zzX, degree, M, a, 1, mPrime);
+	iterative_interpolate_zp(Polynomial, temp, zzY, a, M, degree * 2 + 1, 1, mPrime);
+
+	for (int c = 0; c <= degree; c++) {
+		BytesFromZZ((u8*)&coefficents[c], rep(Polynomial.rep[c]), sizeof(block));
+	}
+
+}
+
+inline  void PolyEncode(const std::vector<block> setKeys, const std::vector<block> setValues, std::vector<block>& coefficents)
+{
+	std::vector<std::pair<block, block>> key_values(setKeys.size());
+
+	for (u64 i = 0; i < key_values.size(); ++i)
+	{
+		memcpy((u8*)&key_values[i].first, (u8*)&setKeys[i], sizeof(block));
+		memcpy((u8*)&key_values[i].second, (u8*)&setValues[i], sizeof(block));
+	}
+	//std::cout << setValues[0] << " vs " << key_values[0].second << "\n";
+
+	PolyEncode(key_values, coefficents);
+}
+
+inline  void PolyDecode(const std::vector<block> coefficents, const std::vector<block> setKeys, std::vector<block>& setValues)
+{
+	setValues.resize(setKeys.size());
+	ZZ_pX Polynomial;
+	ZZ mPrime = to_ZZ("340282366920938463463374607431768211507"); //nextprime(2^128)
+	ZZ_p::init(ZZ(mPrime));
+
+	u64 degree = setKeys.size() - 1; //2%
+	ZZ_p* zzX = new ZZ_p[setKeys.size()];
+	ZZ_p* zzY = new ZZ_p[setKeys.size()];
+	ZZ zz;
+
+	for (u64 idx = 0; idx < setKeys.size(); idx++)
+	{
+		ZZFromBytes(zz, (u8*)&setKeys[idx], sizeof(block));
+		zzX[idx] = to_ZZ_p(zz);
+	}
+
+
+	for (int c = 0; c <= degree; c++) {
+		ZZFromBytes(zz, (u8*)&coefficents[c], sizeof(block));
+		NTL::SetCoeff(Polynomial, c, to_ZZ_p(zz));
+	}
+
+	multipoint_evaluate_zp(Polynomial, zzX,zzY, degree, 1, mPrime);
+
+	for (u64 idx = 0; idx < setKeys.size(); idx++)
+		BytesFromZZ((u8*)&setValues[idx], rep(zzY[idx]), sizeof(block));
+}
+
+inline void PolyTest()
+{
+	std::cout << " ============== GbfTest ==============\n";
+
+	PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
+
+	std::vector<std::pair<block, block>> key_values(128);
+	std::vector<block> setKeys(128);
+	std::vector<block> setValues(128);
+	std::vector<block> setValuesOut(128);
+
+	for (u64 i = 0; i < key_values.size(); ++i)
+	{
+		key_values[i].first = prng.get<block>();
+		key_values[i].second = prng.get<block>();
+		setKeys[i] = key_values[i].first;
+		setValues[i] = key_values[i].second;
+	}
+
+	std::vector<block> coefficients;
+	//GbfEncode(key_values, coefficients);
+	PolyEncode(setKeys, setValues, coefficients);
+
+	/*for (size_t i = 0; i < 10; i++)
+		std::cout << coefficients[i] << "\n";*/
+
+
+
+	PolyDecode(coefficients, setKeys, setValuesOut);
+
+	for (size_t i = 0; i < 128; i++)
+	{
+		if (setValues[i] != setValuesOut[i])
+			std::cout << setValues[i] << " vs " << setValuesOut[i] << "\n";
+
+	}
+	std::cout << " ============== done ==============\n";
 
 }

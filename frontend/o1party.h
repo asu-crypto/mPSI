@@ -41,6 +41,8 @@ inline void party1_encode(std::vector<block> inputSet, const std::vector<block> 
 
 	if (type_okvs == GbfOkvs)
 		GbfEncode(inputSet, setValues, okvsTable);
+	else if (type_okvs == PolyOkvs)
+		PolyEncode(inputSet, setValues, okvsTable);
 
 	/*std::cout << IoStream::lock;
 	for (u64 i = 0; i < 2; i++)
@@ -77,6 +79,8 @@ inline void party2_encode(const std::vector<block> inputSet, const block& aesKey
 
 	if (type_okvs == GbfOkvs)
 		GbfEncode(inputSet, setValues, okvsTable);
+	else if (type_okvs == PolyOkvs)
+		PolyEncode(inputSet, setValues, okvsTable);
 
 	//if (type_okvs == PolyOkvs) //TODO
 }
@@ -101,6 +105,9 @@ inline void partyn1_decode(const std::vector<block> inputSet, const block& aesKe
 		std::vector<block> setValues(inputSet.size());
 		if (type_okvs == GbfOkvs)
 			GbfDecode(okvsTables[idxParty], inputSet, setValues); // setValues[idxItem]=Decode(okvsTables[idxParty], x)
+		else if (type_okvs == PolyOkvs)
+			PolyDecode(okvsTables[idxParty], inputSet, setValues); // setValues[idxItem]=Decode(okvsTables[idxParty], x)
+
 
 		for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem) //compute xor all decode() 
 			inputSet2PSI[idxItem] = inputSet2PSI[idxItem] ^ setValues[idxItem];
@@ -130,6 +137,8 @@ inline void partyn_decode(const std::vector<block> inputSet, const std::vector<b
 
 	if (type_okvs == GbfOkvs)
 		GbfDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
+	else if (type_okvs == PolyOkvs)
+		PolyDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
 
 
 	/*std::cout << IoStream::lock;
@@ -141,8 +150,10 @@ inline void partyn_decode(const std::vector<block> inputSet, const std::vector<b
 		inputSet2PSI[idxItem] = inputSet2PSI[idxItem] ^ inputSet[idxItem]; //simulate x||F(x) xor all decodes
 }
 
-inline void party_test()
+inline void party_test(u64 type_okvs)
 {
+	std::cout << " ============== party_test ==============\n";
+
 	u64 nParties = 5, setSize = 128, intersection_size = 10;
 	u64 party_n1 = nParties - 2; //party n-1
 	u64 party_n = nParties - 1; //party n
@@ -168,17 +179,17 @@ inline void party_test()
 
 
 	std::vector<block> okvsTable1; //okvs of party1
-	party1_encode(inputSets[0], aesKeys, okvsTable1, nParties, GbfOkvs, secSemiHonest);
+	party1_encode(inputSets[0], aesKeys, okvsTable1, nParties, type_okvs, secSemiHonest);
 
 	std::vector <std::vector<block>> okvsTables(nParties - 3); //okvs of party 2 -> n-2
 	for (u64 idxParty = 0; idxParty < okvsTables.size(); idxParty++)
-		party2_encode(inputSets[idxParty + 1], aesKeys[idxParty], okvsTables[idxParty], GbfOkvs, secSemiHonest);
+		party2_encode(inputSets[idxParty + 1], aesKeys[idxParty], okvsTables[idxParty], type_okvs, secSemiHonest);
 
 	std::vector<block> inputSet2PSI_n1; //party n-1
-	partyn1_decode(inputSets[party_n1], aesKeys[aesKeys.size() - 1], okvsTables, inputSet2PSI_n1, GbfOkvs, secSemiHonest);
+	partyn1_decode(inputSets[party_n1], aesKeys[aesKeys.size() - 1], okvsTables, inputSet2PSI_n1, type_okvs, secSemiHonest);
 
 	std::vector<block> inputSet2PSI_n; //party n
-	partyn_decode(inputSets[party_n], okvsTable1, inputSet2PSI_n, GbfOkvs, secSemiHonest);
+	partyn_decode(inputSets[party_n], okvsTable1, inputSet2PSI_n, type_okvs, secSemiHonest);
 
 	for (u64 i = 0; i < setSize; ++i)
 	{
@@ -188,7 +199,7 @@ inline void party_test()
 		if (i >= intersection_size && inputSet2PSI_n1[i] == inputSet2PSI_n[i])
 			std::cout << inputSet2PSI_n1[i] << " vs " << inputSet2PSI_n[i] << " \t expected != \n";
 	}
-	std::cout << "end\n";
+	std::cout << " ============== done ==============\n";
 
 }
 
@@ -206,10 +217,11 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 	u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
 
 
-
-
 	if (type_okvs == GbfOkvs)
 		okvsTableSize = 60 * setSize;
+	else if (type_okvs == PolyOkvs)
+		okvsTableSize = setSize;
+
 
 	std::string name("psi");
 	BtIOService ios(0);
