@@ -28,7 +28,7 @@ void usage(const char* argv0)
 }
 int main(int argc, char** argv)
 {
-	InitDebugPrinting();
+	//InitDebugPrinting();
 	//GbfTest();
 	//PolyTest();
 	//party_test(PolyOkvs);

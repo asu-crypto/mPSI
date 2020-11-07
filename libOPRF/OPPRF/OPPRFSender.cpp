@@ -2142,13 +2142,13 @@ namespace osuCrypto
 
 
 		std::vector<u64> cnt(3,0);
-		std::cout <<"bins.mSimpleBins.mBins.size()= " << bins.mSimpleBins.mBins.size() << std::endl;
+		//std::cout <<"bins.mSimpleBins.mBins.size()= " << bins.mSimpleBins.mBins.size() << std::endl;
 
 		for (int idxBin = 0; idxBin < bins.mSimpleBins.mBins.size(); idxBin++) //forall bins
 		{
 			if (bins.mSimpleBins.mBins[idxBin].mIdx.size() > 0)
 			{
-				std::cout << "bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty].size()= " << bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty].size() << std::endl;
+				//std::cout << "bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty].size()= " << bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty].size() << std::endl;
 
 				for (int i = 0; i < bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty].size(); i++) //forall oprf in bin interacted with  idxParty 
 				{
@@ -2156,7 +2156,7 @@ namespace osuCrypto
 					auto hIdx = bins.mSimpleBins.mBins[idxBin].hIdx[i];
 					if (hIdx < 3 && cnt[hIdx]< mN) //for no stash bin, we only use 3 hash functions
 					{
-						std::cout << hIdx << " -   c_idx=" << cnt[hIdx] << "  mValOPRF=" << bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty][i] << std::endl;
+						//std::cout << hIdx << " -   c_idx=" << cnt[hIdx] << "  mValOPRF=" << bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty][i] << std::endl;
 						
 						if (hIdx == 0)
 								memcpy(maskView1[cnt[hIdx]].data(), (u8*)&bins.mSimpleBins.mBins[idxBin].mValOPRF[IdxTheirParty][i], bins.mMaskSize);

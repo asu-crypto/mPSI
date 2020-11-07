@@ -191,12 +191,13 @@ inline void party_test(u64 type_okvs)
 	std::vector<block> inputSet2PSI_n; //party n
 	partyn_decode(inputSets[party_n], okvsTable1, inputSet2PSI_n, type_okvs, secSemiHonest);
 
+
 	for (u64 i = 0; i < setSize; ++i)
 	{
-		if (i < intersection_size && inputSet2PSI_n1[i] != inputSet2PSI_n[i])
+		if (i < intersection_size && (memcmp((u8*)&inputSet2PSI_n1[i], (u8*)&inputSet2PSI_n[i], sizeof(block)) == 1))
 			std::cout << inputSet2PSI_n1[i] << " vs " << inputSet2PSI_n[i] << " \t expected = \n";
 
-		if (i >= intersection_size && inputSet2PSI_n1[i] == inputSet2PSI_n[i])
+		if (i >= intersection_size && (memcmp((u8*)&inputSet2PSI_n1[i], (u8*)&inputSet2PSI_n[i], sizeof(block)) == 0))
 			std::cout << inputSet2PSI_n1[i] << " vs " << inputSet2PSI_n[i] << " \t expected != \n";
 	}
 	std::cout << " ============== done ==============\n";

@@ -249,14 +249,14 @@ void party2psi(u64 myIdx, u64 setSize, std::vector<block> set)
 		for (int i = 0; i < bins.mSimpleBins.mBins[0].mValOPRF[1].size(); i++)
 		{
 
-			std::cout << bins.mSimpleBins.mBins[0].mValOPRF[1][i] << std::endl;
+			//std::cout << bins.mSimpleBins.mBins[0].mValOPRF[1][i] << std::endl;
 			//Log::out << recvPayLoads[2][i] << Log::endl;
 		}
 		std::cout << "------------" << std::endl;
 	}
 	if (myIdx == 1)
 	{
-		std::cout << bins.mCuckooBins.mBins[0].mValOPRF[0] << std::endl;
+		//std::cout << bins.mCuckooBins.mBins[0].mValOPRF[0] << std::endl;
 
 		//for (int i = 0; i < bins.mCuckooBins.mBins[0].mValOPRF[0].size(); i++)
 		//{
@@ -339,8 +339,8 @@ void O1nPSI_Test()
 		pThrds[pIdx] = std::thread([&, pIdx]() {
 			//Channel_party_test(pIdx, nParties);
 			//partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
-			//partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
-			partyO1(pIdx, nParties, setSize,PolyOkvs, secSemiHonest);
+			partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
+			//partyO1(pIdx, nParties, setSize,PolyOkvs, secSemiHonest);
 			});
 	}
 

@@ -173,7 +173,7 @@ inline void GbfTest()
 
 	for (size_t i = 0; i < 128; i++)
 	{
-		if(setValues[i]!= setValuesOut[i])
+		if(memcmp((u8*)&setValues[i], (u8*)&setValuesOut[i], sizeof(block)) == 1)
 			std::cout << setValues[i] << " vs " << setValuesOut[i] << "\n";
 
 	}
@@ -291,7 +291,8 @@ inline void PolyTest()
 
 	for (size_t i = 0; i < 128; i++)
 	{
-		if (setValues[i] != setValuesOut[i])
+		//if (setValues[i] != setValuesOut[i])
+		if (memcmp((u8*)&setValues[i], (u8*)&setValuesOut[i], sizeof(block)) == 1)
 			std::cout << setValues[i] << " vs " << setValuesOut[i] << "\n";
 
 	}
