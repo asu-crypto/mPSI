@@ -1,14 +1,4 @@
-# Programmable Oblivious PRF & multi-party PSI
-This is the implementation of our [CCS 2017](http://dl.acm.org/xxx)  paper: **Practical Multi-party Private Set Intersection from Symmetric-Key Techniques**[[ePrint](https://eprint.iacr.org/2017/xxx)]. 
 
-Evaluating on a single Intel Xeon server (`2 36-cores Intel Xeon CPU E5-2699 v3 @ 2.30GHz and 256GB of RAM`), ours protocol requires only `71` seconds to securely compute the intersection of `5` parties, each has `2^20`-size sets, regardless of the bit length of the items.
-
-For programmable OPRF, this code implements:
-* Table-based OPPRF
-* Polynomial-based  OPPRF
-* BloomFilter-based OPPRF
-
-For PSI, we implement multi-party PSI (nPSI) in augmented-semihonest model and standard semihonest model.
 
 ## Installations
 
