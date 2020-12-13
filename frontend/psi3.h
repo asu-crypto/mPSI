@@ -16,12 +16,6 @@
 
 using namespace osuCrypto;
 
-inline void party1_psi3_encode() {}
-
-inline void party2_psi3_encode() {}
-
-inline void party3_psi3_encode() {}
-
 inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 	{
 		u64 nParties = 3;
@@ -246,6 +240,177 @@ inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 			}
 		}
 
+
+		//close chanels 
+		for (u64 i = 0; i < nParties; ++i)
+			if (i != myIdx)
+				for (u64 j = 0; j < numChannelThreads; ++j)
+					chls[i][j]->close();
+
+		for (u64 i = 0; i < nParties; ++i)
+			if (i != myIdx)
+				ep[i].stop();
+
+		ios.stop();
+	}
+
+inline void party_psi2_server_aided(u64 myIdx, u64 setSize, u64 type_security)
+	{
+		u64 nParties = 3;
+		std::fstream textout;
+		textout.open("./runtime_" + myIdx, textout.app | textout.out);
+
+#pragma region setup
+		u64  psiSecParam = 40, bitSize = 128, numChannelThreads = 1, okvsTableSize = setSize;
+		double dataSent, Mbps, MbpsRecv, dataRecv;
+		Timer timer;
+		PRNG prng(_mm_set_epi32(4253465, 3434565, myIdx, myIdx));
+		u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
+		std::vector<u32> mIntersection;
+
+		std::string name("psi");
+		BtIOService ios(0);
+		std::vector<BtEndpoint> ep(nParties);
+		std::vector<std::vector<Channel*>> chls(nParties);
+
+		for (u64 i = 0; i < nParties; ++i)
+		{
+			if (i < myIdx)
+			{
+				u32 port = 1200 + i * 100 + myIdx;;//get the same port; i=1 & pIdx=2 =>port=102
+				ep[i].start(ios, "localhost", port, false, name); //channel bwt i and pIdx, where i is sender
+			}
+			else if (i > myIdx)
+			{
+				u32 port = 1200 + myIdx * 100 + i;//get the same port; i=2 & pIdx=1 =>port=102
+				ep[i].start(ios, "localhost", port, true, name); //channel bwt i and pIdx, where i is receiver
+			}
+		}
+
+
+		for (u64 i = 0; i < nParties; ++i)
+		{
+			if (i != myIdx) {
+				chls[i].resize(numChannelThreads);
+				for (u64 j = 0; j < numChannelThreads; ++j)
+					chls[i][j] = &ep[i].addChannel(name, name);
+			}
+		}
+
+		u64 maskSize = roundUpTo(psiSecParam + 2 * std::log2(setSize) - 1, 8) / 8;
+
+
+		PRNG prngSame(_mm_set_epi32(4253465, 3434565, 234435, 23987045)), prngDiff(_mm_set_epi32(434653, 23, myIdx, myIdx));
+		std::vector<block> inputSet(setSize);
+
+		if (myIdx == 0 || myIdx == 1) //two parties have input
+		{
+			for (u64 i = 0; i < expected_intersection; ++i)
+				inputSet[i] = prngSame.get<block>();
+
+			for (u64 i = expected_intersection; i < setSize; ++i)
+				inputSet[i] = prngDiff.get<block>();
+		}
+#pragma endregion
+
+
+		timer.reset();
+		auto start = timer.setTimePoint("start");
+
+		std::vector <block> aesKeys(2); // for party 1 and 2
+		std::vector<std::vector<block>> ciphertexts(2); //for party 1 and 2 to compute F(k, a)
+		for (int i = 0; i < ciphertexts.size(); i++)
+			ciphertexts[i].resize(setSize);
+
+		std::vector<std::vector<block>> recv_ciphertexts(2); //for server to receive pi(F(k, a)) form party 1 and 2
+		for (int i = 0; i < recv_ciphertexts.size(); i++)
+			recv_ciphertexts[i].resize(setSize);
+
+
+		//====================================
+		//============exchange aes keys => send pi(F_ki(xi)) to server => server computes intersection========
+		if (myIdx == 0)
+		{
+			//generating aes key and sends it to party 2
+			aesKeys[0] = prng.get<block>();
+			chls[1][0]->asyncSend(&aesKeys[0], sizeof(block)); //sending aesKeys_party1 to party 2 (idx=1)
+
+			AES party1_AES(aesKeys[0]);
+			party1_AES.ecbEncBlocks(inputSet.data(), inputSet.size(), ciphertexts[0].data()); //compute F_ki(xi)
+			//shuffle(ciphertexts[0].begin(), ciphertexts[0].end(), prngSame); //
+			
+			chls[2][0]->asyncSend(ciphertexts[0].data(), ciphertexts[0].size()*sizeof(block)); //send pi(F_ki(xi)) to server (party 3)
+
+			/*std::cout << IoStream::lock;
+				for (u64 i = 0; i < expected_intersection + 2; ++i)
+					std::cout << ciphertexts[0][i] << " - ciphertexts[0][0]  - " << myIdx << std::endl;
+			std::cout << IoStream::unlock;*/
+		}
+
+		else if (myIdx == 1)
+		{
+			chls[0][0]->recv(&aesKeys[1], sizeof(block));  //receiving aesKey from paty 1 (idx=0)
+		
+														   //P2 computes encoding========
+			AES party2_AES(aesKeys[1]);
+			party2_AES.ecbEncBlocks(inputSet.data(), inputSet.size(), ciphertexts[1].data()); //compute F_ki(xi)
+			//shuffle(ciphertexts[1].begin(), ciphertexts[1].end(), prngDiff);
+
+			chls[2][0]->asyncSend(ciphertexts[1].data(), ciphertexts[1].size() * sizeof(block)); // send pi(F_ki(xi)) to server (party 3)
+
+			/*std::cout << IoStream::lock;
+			for (u64 i = 0; i < expected_intersection + 2; ++i)
+				std::cout << ciphertexts[1][i] << " - ciphertexts[1][0]  - " << myIdx << std::endl;
+			std::cout << IoStream::unlock;*/
+		}
+		else if (myIdx == 2) //server
+		{
+			chls[0][0]->recv(recv_ciphertexts[0].data(), setSize * sizeof(block)); // receive pi(F_ki(xi)) from party 1
+			chls[1][0]->recv(recv_ciphertexts[1].data(), setSize * sizeof(block));  // receive pi(F_ki(xi)) from party 2
+
+			/*std::cout << IoStream::lock;
+			for (u64 i = 0; i < expected_intersection + 2; ++i)
+			{
+				std::cout << recv_ciphertexts[0][i] << " - recv_ciphertexts[0][0]  - " << myIdx << std::endl;
+				std::cout << recv_ciphertexts[1][i] << " - recv_ciphertexts[1][0]  - " << myIdx << std::endl;
+			}
+			std::cout << IoStream::unlock;*/
+
+			////compute intersection here
+
+			std::unordered_map<u64, std::pair<block, u64>> localMasks;
+			for (u32 i = 0; i < setSize; i++) //create an unordered_map for recv_ciphertexts[0]
+			{
+				localMasks.emplace(*(u64*)&recv_ciphertexts[0][i], std::pair<block, u32>(recv_ciphertexts[0][i], i));
+			}
+
+			for (int i = 0; i < setSize; i++) //for each item in recv_ciphertexts[1], we check it in localMasks
+			{
+				u64 shortcut; 
+				memcpy((u8*)&shortcut, (u8*)&recv_ciphertexts[1][i], sizeof(u64));
+				auto match = localMasks.find(shortcut);
+
+				//if match, check for whole bits
+				if (match != localMasks.end())
+				{
+					if (memcmp((u8*)&recv_ciphertexts[1][i], &match->second.first, sizeof(block)) == 0) // check full mask
+					{
+						mIntersection.push_back(match->second.second);
+					}
+				}
+			}
+			Log::out << "mIntersection.size(): " << mIntersection.size() << Log::endl;
+
+			//Skip this steps
+			//chls[0][0]->asyncSend(mIntersection.data(), mIntersection.size() * sizeof(u32)); // send index of the intersection
+			//chls[1][0]->asyncSend(mIntersection.data(), mIntersection.size() * sizeof(u32)); // send index of the intersection
+		}
+
+		//if (myIdx == 0 || myIdx == 1)
+		//{
+		//	chls[2][0]->recv(mIntersection.data(),mIntersection.size() * sizeof(u32)); // receive pi(F_ki(xi)) from party 1
+		//}
+	
 
 		//close chanels 
 		for (u64 i = 0; i < nParties; ++i)

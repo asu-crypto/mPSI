@@ -32,4 +32,5 @@ void party2psi_Test_Main();
 //void GbfTest();
 
 void nPSI3_Test();
+void nPSI2_server_aided_Test();
 //void Channel_party_test(u64 myIdx, u64 nParties)

@@ -34,7 +34,8 @@ int main(int argc, char** argv)
 	//party_test(PolyOkvs);
 	//party2psi_Test_Main();
 	//O1nPSI_Test();
-	nPSI3_Test();
+	//nPSI3_Test();
+	nPSI2_server_aided_Test();
 	return 0;
 
 	//myCuckooTest_stash();

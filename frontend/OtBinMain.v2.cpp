@@ -354,9 +354,9 @@ void O1nPSI_Test()
 
 void nPSI3_Test()
 {
-	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128, nParties = 5;
+	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128;
 
-	std::vector<std::thread>  pThrds(nParties);
+	std::vector<std::thread>  pThrds(3);
 	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
 	{
 		pThrds[pIdx] = std::thread([&, pIdx]() {
@@ -367,4 +367,21 @@ void nPSI3_Test()
 	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
 		pThrds[pIdx].join();
 }
+
+void nPSI2_server_aided_Test()
+{
+	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128;
+
+	std::vector<std::thread>  pThrds(3);
+	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+	{
+		pThrds[pIdx] = std::thread([&, pIdx]() {
+			party_psi2_server_aided(pIdx, setSize, secSemiHonest);
+			});
+	}
+
+	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+		pThrds[pIdx].join();
+}
+
 
