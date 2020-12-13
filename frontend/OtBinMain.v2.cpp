@@ -23,6 +23,7 @@ using namespace osuCrypto;
 #include "gbf.h"
 #include "Common/ByteStream.h"
 #include "o1party.h"
+#include "psi3.h"
 
 
 void Channel_party_test(u64 myIdx, u64 nParties)
@@ -348,5 +349,22 @@ void O1nPSI_Test()
 		pThrds[pIdx].join();
 
 
+}
+
+
+void nPSI3_Test()
+{
+	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128, nParties = 5;
+
+	std::vector<std::thread>  pThrds(nParties);
+	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+	{
+		pThrds[pIdx] = std::thread([&, pIdx]() {
+			party_psi3(pIdx, setSize, GbfOkvs, secSemiHonest);
+			});
+	}
+
+	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+		pThrds[pIdx].join();
 }
 
