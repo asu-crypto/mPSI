@@ -24,6 +24,7 @@ using namespace osuCrypto;
 #include "Common/ByteStream.h"
 #include "o1party.h"
 #include "psi3.h"
+#include "tpsi.h"
 
 
 void Channel_party_test(u64 myIdx, u64 nParties)
@@ -384,4 +385,23 @@ void nPSI2_server_aided_Test()
 		pThrds[pIdx].join();
 }
 
+void ResilliencenPSI_Test()
+{
+	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128, nParties = 5;
+	u64 threshold = 2;
+	std::vector<std::thread>  pThrds(nParties);
+	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+	{
+		pThrds[pIdx] = std::thread([&, pIdx]() {
+			//Channel_party_test(pIdx, nParties);
+			//partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
+			tpsi_party(pIdx, nParties, setSize, threshold, GbfOkvs, secSemiHonest);
+			//partyO1(pIdx, nParties, setSize,PolyOkvs, secSemiHonest);
+			});
+	}
 
+	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+		pThrds[pIdx].join();
+
+
+}
