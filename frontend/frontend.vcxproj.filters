@@ -62,6 +62,9 @@
     <ClInclude Include="psi3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tpsi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

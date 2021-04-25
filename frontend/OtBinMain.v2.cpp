@@ -385,7 +385,7 @@ void nPSI2_server_aided_Test()
 		pThrds[pIdx].join();
 }
 
-void ResilliencenPSI_Test()
+void tPSI_Test()
 {
 	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128, nParties = 5;
 	u64 threshold = 2;

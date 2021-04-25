@@ -120,13 +120,13 @@ inline void server_prf(const std::vector<block> inputSet, const std::vector<bloc
 }
 
 
-inline void tparty_test(u64 type_okvs)
+inline void tpsi_test(u64 type_okvs, u64 type_security)
 {
 	std::cout << " ============== party_test ==============\n";
 
-	u64 nParties = 5, setSize = 128, intersection_size = 10;
-	u64 party_n1 = nParties - 2; //party n-1
-	u64 party_n = nParties - 1; //party n
+	u64 nParties = 7, setSize = 32, intersection_size = 2;
+	u64 threshold = 4;
+	u64 party_t_id = nParties - threshold - 1;
 
 	PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 	std::vector <std::vector<block>> inputSets(nParties);
@@ -143,34 +143,38 @@ inline void tparty_test(u64 type_okvs)
 			inputSets[i][j] = inputSets[0][j];
 
 	//generating aes keys
-	std::vector<block> aesKeys(nParties - 2); //aesKeys[0] for party 2
+	std::vector<block> aesKeys(nParties); //aesKeys[0] for party 2
 	for (u64 i = 0; i < aesKeys.size(); ++i)
 		aesKeys[i] = prng.get<block>();
 
+	std::vector <std::vector<block>> okvsTables(party_t_id);
 
-	//std::vector<block> okvsTable1; //okvs of party1
-	//party1_encode(inputSets[0], aesKeys, okvsTable1, nParties, type_okvs, secSemiHonest);
+	std::vector <std::vector<block>> inputSet2ZeroXOR(nParties); //but only use [t--->n]
 
-	//std::vector <std::vector<block>> okvsTables(nParties - 3); //okvs of party 2 -> n-2
-	//for (u64 idxParty = 0; idxParty < okvsTables.size(); idxParty++)
-	//	party2_encode(inputSets[idxParty + 1], aesKeys[idxParty], okvsTables[idxParty], type_okvs, secSemiHonest);
+	for (u64 idxParty = 0; idxParty < party_t_id; ++idxParty) //user computes XOR of all F(k, value) and encodes them before sending to party_t
+	{
+		user_encode(inputSets[idxParty], aesKeys, okvsTables[idxParty], party_t_id, nParties, type_okvs, type_security);
+	}
 
-	//std::vector<block> inputSet2PSI_n1; //party n-1
-	//partyn1_decode(inputSets[party_n1], aesKeys[aesKeys.size() - 1], okvsTables, inputSet2PSI_n1, type_okvs, secSemiHonest);
+	partyt_decode(inputSets[party_t_id], okvsTables, inputSet2ZeroXOR[party_t_id], type_okvs, type_security);
 
-	//std::vector<block> inputSet2PSI_n; //party n
-	//partyn_decode(inputSets[party_n], okvsTable1, inputSet2PSI_n, type_okvs, secSemiHonest);
+	for (u64 idxParty = party_t_id+1; idxParty < nParties; ++idxParty) //server
+		server_prf(inputSets[idxParty], aesKeys, inputSet2ZeroXOR[idxParty], type_okvs, type_security);
 
-
-	//for (u64 i = 0; i < setSize; ++i)
-	//{
-	//	if (i < intersection_size && (memcmp((u8*)&inputSet2PSI_n1[i], (u8*)&inputSet2PSI_n[i], sizeof(block)) == 1))
-	//		std::cout << inputSet2PSI_n1[i] << " vs " << inputSet2PSI_n[i] << " \t expected = \n";
-
-	//	if (i >= intersection_size && (memcmp((u8*)&inputSet2PSI_n1[i], (u8*)&inputSet2PSI_n[i], sizeof(block)) == 0))
-	//		std::cout << inputSet2PSI_n1[i] << " vs " << inputSet2PSI_n[i] << " \t expected != \n";
-	//}
-	//std::cout << " ============== done ==============\n";
+	
+	//check zeroXOR
+	std::cout << " ============== check zeroXOR ==============\n";
+	for (u64 i = 0; i < intersection_size*2; ++i)
+	{
+		block checkZeroXOR=ZeroBlock;
+		for (u64 idxParty = party_t_id; idxParty < nParties; ++idxParty) //server
+			checkZeroXOR = checkZeroXOR ^ inputSet2ZeroXOR[idxParty][i];
+		if (i< intersection_size)
+			std::cout <<  checkZeroXOR << " -----------expected 0 \n" ;
+		else 
+			std::cout << checkZeroXOR << " -----------expected !0 \n";
+	}
+	std::cout << " ============== done ==============\n";
 
 }
 
