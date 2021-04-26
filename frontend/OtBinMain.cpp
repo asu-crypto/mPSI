@@ -30,7 +30,7 @@ u64 nParties(3);
 
 u64 opt = 0;
 
-bool isNTLThreadSafe = false;
+
 
 void Channel_test()
 {

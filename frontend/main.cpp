@@ -34,12 +34,13 @@ int main(int argc, char** argv)
 	//PolyTest();
 	//party_test(PolyOkvs);
 	//party2psi_Test_Main();
-	tpsi_test(GbfOkvs, secSemiHonest);
+	//tpsi_test(GbfOkvs, secSemiHonest);
 	
 	//============
 	/*O1nPSI_Test();
 	nPSI3_Test();
 	nPSI2_server_aided_Test();*/
+	tPSI_Test();
 	return 0;
 
 	//myCuckooTest_stash();

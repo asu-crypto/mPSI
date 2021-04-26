@@ -387,9 +387,12 @@ void nPSI2_server_aided_Test()
 
 void tPSI_Test()
 {
-	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128, nParties = 5;
-	u64 threshold = 2;
+	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128, nParties = 10;
+	u64 threshold = 4;
 	std::vector<std::thread>  pThrds(nParties);
+
+	//std::vector <block> testXORzero(nParties);
+
 	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
 	{
 		pThrds[pIdx] = std::thread([&, pIdx]() {
@@ -403,5 +406,8 @@ void tPSI_Test()
 	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
 		pThrds[pIdx].join();
 
+	//for (u64 pIdx = nParties - threshold+1; pIdx < nParties; ++pIdx)
+	//	testXORzero[nParties - threshold] = testXORzero[nParties - threshold] ^testXORzero[pIdx];
 
+	//std::cout << testXORzero[nParties - threshold] << " final \n";
 }

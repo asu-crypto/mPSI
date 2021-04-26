@@ -7,9 +7,12 @@
 
 #define GbfOkvs 0
 #define PolyOkvs 1
+#define	TableOkvs 3
 
 #define secMalicious 0
 #define secSemiHonest 1
+
+#define isNTLThreadSafe 0
 
 void InitDebugPrinting(std::string file = "../testoutput.txt");
 
