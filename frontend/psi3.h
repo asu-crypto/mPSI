@@ -31,7 +31,7 @@ inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 
 
 		if (type_okvs == GbfOkvs)
-			okvsTableSize = 60 * setSize;
+			okvsTableSize = okvsLengthScale * setSize;
 		else if (type_okvs == PolyOkvs)
 			okvsTableSize = setSize;
 

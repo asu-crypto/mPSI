@@ -219,7 +219,7 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 
 
 	if (type_okvs == GbfOkvs)
-		okvsTableSize = 60 * setSize;
+		okvsTableSize = okvsLengthScale * setSize;
 	else if (type_okvs == PolyOkvs)
 		okvsTableSize = setSize;
 

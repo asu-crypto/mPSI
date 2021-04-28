@@ -12,8 +12,8 @@
 #define secMalicious 0
 #define secSemiHonest 1
 
-#define okvsHashFunctions 40
-#define okvsLengthScale 60
+#define okvsHashFunctions 3
+#define okvsLengthScale 2
 
 #define isNTLThreadSafe 0
 

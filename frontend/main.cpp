@@ -30,7 +30,8 @@ void usage(const char* argv0)
 int main(int argc, char** argv)
 {
 	//InitDebugPrinting();
-	//GbfTest();
+//	GbfTest();
+//	return 0; 
 	//PolyTest();
 	//party_test(PolyOkvs);
 	//party2psi_Test_Main();

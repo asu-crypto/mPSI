@@ -561,7 +561,7 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 
 
 	if (type_okvs == GbfOkvs)
-		okvsTableSize = 60 * setSize;
+		okvsTableSize = okvsLengthScale * setSize;
 	else if (type_okvs == PolyOkvs)
 		okvsTableSize = setSize;
 
