@@ -2,7 +2,7 @@ $RemoteUserName='trieun'
 $RemoteHostName='eve.eecs.oregonstate.edu'
 $PrivateKey='D:\EvePrivatekey.ppk'
 $SolutionDir=$PWD
-$RemoteWorkingDir='/scratch/nini/npsi_2020/npsi_my'
+$RemoteWorkingDir='/scratch/nini/psi_n'
 
 # only files with these exptenstions will be copied
 $FileMasks='**.cpp;**.c;**.h;*CMakeLists.txt;*.bin;*.S;thirdparty/linux/**.get'

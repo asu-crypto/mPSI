@@ -388,7 +388,7 @@ void nPSI2_server_aided_Test()
 void tPSI_Test()
 {
 	u64 setSize = 1 << 8, psiSecParam = 40, bitSize = 128, nParties = 10;
-	u64 threshold = 4;
+	u64 threshold = 2;
 	std::vector<std::thread>  pThrds(nParties);
 
 	//std::vector <block> testXORzero(nParties);
@@ -398,7 +398,7 @@ void tPSI_Test()
 		pThrds[pIdx] = std::thread([&, pIdx]() {
 			//Channel_party_test(pIdx, nParties);
 			//partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
-			tpsi_party(pIdx, nParties, setSize, threshold, GbfOkvs, secSemiHonest);
+			tpsi_party(pIdx, nParties, threshold, setSize, GbfOkvs, secSemiHonest);
 			//partyO1(pIdx, nParties, setSize,PolyOkvs, secSemiHonest);
 			});
 	}

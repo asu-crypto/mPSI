@@ -220,13 +220,13 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 		std::vector<OPPRFReceiver> recv(nPartiesZeroXor);
 		std::vector<std::thread>  pThrds(nPartiesZeroXor - 1);
 
-		Timer timer;
+		//Timer timer;
 
 		//##########################
 		//### Offline Phasing
 		//##########################
 
-		auto start = timer.setTimePoint("start");
+		//auto start = timer.setTimePoint("start");
 		PRNG prng_zs(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 
 		//TODO(remove this hack: unconditional zero - sharing);
@@ -270,16 +270,16 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 			//sendPayLoads[i] =inputSet2ZeroXOR[i]; //add zeroshare
 		}
 
-		bins.init(myIdx, nPartiesZeroXor, setSize, psiSecParam, type_okvs,1);
+		bins.init(myIdx, nPartiesZeroXor, setSize, psiSecParam, TableOPPRF,1);
 		u64 otCountSend = bins.mSimpleBins.mBins.size();
 		u64 otCountRecv = bins.mCuckooBins.mBins.size();
 
 
 		if (myIdx != leaderIdx) {
 			
-			std::cout << IoStream::lock;
+			/*std::cout << IoStream::lock;
 				Log::out << myIdx << "------send --" <<leaderIdx << " chls[" << leaderIdx + chl_idx_shift << "------" << Log::endl;
-			std::cout << IoStream::unlock;
+			std::cout << IoStream::unlock;*/
 
 			send.init(bins.mOpt, nPartiesZeroXor, setSize, psiSecParam, bitSize, chls[leaderIdx+ chl_idx_shift], otCountSend, otSend[leaderIdx], otRecv[leaderIdx], prng.get<block>(), false);
 		}
@@ -293,9 +293,9 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 					if (pIdx != leaderIdx)
 					{
 
-						std::cout << IoStream::lock;
+						/*std::cout << IoStream::lock;
 						Log::out << pIdx << "------recv--" << leaderIdx << "  chls[" << pIdx + chl_idx_shift << "------" << Log::endl;
-						std::cout << IoStream::unlock;
+						std::cout << IoStream::unlock;*/
 
 						recv[pIdx].init(bins.mOpt, nPartiesZeroXor, setSize, psiSecParam, bitSize, chls[pIdx + chl_idx_shift], otCountRecv, otRecv[pIdx], otSend[pIdx], ZeroBlock, false);
 					}
@@ -305,7 +305,7 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 				pThrds[pIdx].join();
 		}
 
-		auto initDone = timer.setTimePoint("initDone");
+		//auto initDone = timer.setTimePoint("initDone");
 
 #ifdef PRINT
 		std::cout << IoStream::lock;
@@ -332,7 +332,7 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 		//bins.mSimpleBins.print(myIdx, true, false, false, false);
 		//bins.mCuckooBins.print(myIdx, true, false, false);
 
-		auto hashingDone = timer.setTimePoint("hashingDone");
+		//auto hashingDone = timer.setTimePoint("hashingDone");
 
 		//##########################
 		//### Online Phasing - compute OPRF
@@ -369,7 +369,7 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 		//	//bins.mCuckooBins.print(leaderIdx, true, true, false);
 		//}
 
-		auto getOPRFDone = timer.setTimePoint("getOPRFDone");
+		//auto getOPRFDone = timer.setTimePoint("getOPRFDone");
 
 		//##########################
 		//### online phasing - secretsharing
@@ -386,9 +386,9 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 					{
 						recv[pIdx].recvSS(pIdx, bins, recvPayLoads[pIdx], chls[pIdx + chl_idx_shift]);
 
-						std::cout << IoStream::lock;
+						/*std::cout << IoStream::lock;
 						Log::out << pIdx << "------recv[pIdx].recvSS-" << leaderIdx << "  recvPayLoads[" << recvPayLoads[pIdx][0] << "------" << Log::endl;
-						std::cout << IoStream::unlock;
+						std::cout << IoStream::unlock;*/
 					}
 				}
 			}
@@ -415,12 +415,12 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 			send.sendSS(leaderIdx, bins, sendPayLoads, chls[leaderIdx + chl_idx_shift]);
 
 
-			std::cout << IoStream::lock;
+			/*std::cout << IoStream::lock;
 			Log::out << myIdx << "------send.sendSS--" << leaderIdx << "  sendPayLoads[" << sendPayLoads[0] << "------" << Log::endl;
-			std::cout << IoStream::unlock;
+			std::cout << IoStream::unlock;*/
 		}
 
-		auto getSSDone = timer.setTimePoint("secretsharingDone");
+		//auto getSSDone = timer.setTimePoint("secretsharingDone");
 
 #ifdef PRINT
 		std::cout << IoStream::lock;
@@ -473,8 +473,8 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 					}
 				}
 
-				if (i <3)
-					std::cout << "sum " << sum << std::endl;
+				/*if (i <3)
+					std::cout << "sum " << sum << std::endl;*/
 
 				if (!memcmp((u8*)&sum, (u8*)&ZeroBlock, bins.mMaskSize))
 				{
@@ -483,11 +483,11 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 			}
 			Log::out << "mIntersection.size(): " << mIntersection.size() << Log::endl;
 		}
-		auto getIntersection = timer.setTimePoint("getIntersection");
+		//auto getIntersection = timer.setTimePoint("getIntersection");
 
 
 
-		if (myIdx == clientdx || myIdx == leaderIdx) {
+		/*if (myIdx == clientdx || myIdx == leaderIdx) {
 
 			if (myIdx == clientdx)
 			{
@@ -501,7 +501,7 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 			if (myIdx == leaderIdx) {
 				Log::out << "#Output Intersection: " << mIntersection.size() << Log::endl;
 			}
-		}
+		}*/
 	
 
 #endif
@@ -512,7 +512,7 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 
 
 
-inline void tpsi_party( u64 myIdx, u64 nParties, u64 setSize, u64 threshold, u64 type_okvs, u64 type_security)
+inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64 type_okvs, u64 type_security)
 {
 	//party 0--->(t-1) distributes key + value to central parties 
 	// party t computes all XOR F(k,value)
@@ -586,7 +586,7 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 setSize, u64 threshold, u64
 	u64 num_threads = nParties - 1; //for party 1
 
 	timer.reset();
-	auto start = timer.setTimePoint("start");
+	auto timer_start = timer.setTimePoint("start");
 
 
 
@@ -685,6 +685,8 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 setSize, u64 threshold, u64
 	//std::cout << party_t_id << " - party_t_id vs nParties" << nParties << std::endl;
 	//std::cout << IoStream::unlock;
 
+	auto timer_server_start = timer.setTimePoint("timer_server_start");
+
 	if (myIdx < nParties && myIdx >= party_t_id) //for zeroXOR
 	{
 		
@@ -693,12 +695,45 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 setSize, u64 threshold, u64
 		std::cout << testXORzero << " before \t" << myIdx << "\n";
 		std::cout << IoStream::unlock;*/
 
-		zeroXOR_party(myIdx- party_t_id, threshold, nParties, chls, inputSet, inputSet2ZeroXOR, mIntersection, TableOkvs, secSemiHonest);
+		zeroXOR_party(myIdx- party_t_id, threshold, nParties, chls, inputSet, inputSet2ZeroXOR, mIntersection, TableOPPRF, secSemiHonest);
 	
 		
 
 	}
+	auto timer_end = timer.setTimePoint("end");
 
+	if (myIdx == party_t_id) {
+
+		auto totalTime_client = std::chrono::duration_cast<std::chrono::milliseconds>(timer_server_start - timer_start).count();
+		auto totalTime_server = std::chrono::duration_cast<std::chrono::milliseconds>(timer_end - timer_server_start).count();
+
+		std::cout << "totalTime_client: " << totalTime_client << "\n";
+		std::cout << "totalTime_server: " << totalTime_server << "\n";
+
+		/*auto offlineTime = std::chrono::duration_cast<std::chrono::milliseconds>(initDone - start).count();
+		auto hashingTime = std::chrono::duration_cast<std::chrono::milliseconds>(hashingDone - initDone).count();
+		auto getOPRFTime = std::chrono::duration_cast<std::chrono::milliseconds>(getOPRFDone - hashingDone).count();
+		auto ss2DirTime = std::chrono::duration_cast<std::chrono::milliseconds>(getSSDone2Dir - getOPRFDone).count();
+		auto ssRoundTime = std::chrono::duration_cast<std::chrono::milliseconds>(getSSDoneRound - getSSDone2Dir).count();
+		auto intersectionTime = std::chrono::duration_cast<std::chrono::milliseconds>(getIntersection - getSSDoneRound).count();
+
+		double onlineTime = hashingTime + getOPRFTime + ss2DirTime + ssRoundTime + intersectionTime;
+
+		double time = offlineTime + onlineTime;
+		time /= 1000;
+
+		std::cout << "setSize: " << setSize << "\n"
+			<< "offlineTime:  " << offlineTime << " ms\n"
+			<< "hashingTime:  " << hashingTime << " ms\n"
+			<< "getOPRFTime:  " << getOPRFTime << " ms\n"
+			<< "ss2DirTime:  " << ss2DirTime << " ms\n"
+			<< "ssRoundTime:  " << ssRoundTime << " ms\n"
+			<< "intersection:  " << intersectionTime << " ms\n"
+			<< "onlineTime:  " << onlineTime << " ms\n"
+			<< "Total time: " << time << " s\n"
+			<< "------------------\n";*/
+	}
+	
 
 	//close chanels 
 	for (u64 i = 0; i < nParties; ++i)
