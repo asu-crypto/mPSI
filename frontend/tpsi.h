@@ -95,6 +95,31 @@ inline void partyt_decode(const std::vector<block> inputSet, const std::vector <
 	//	inputSet2PSI[idxItem] = inputSet2PSI[idxItem] ^ inputSet[idxItem]; //simulate x||F(x) xor all decodes
 }
 
+//for party t
+inline void partyt_decode(std::vector<block> inputSet, const std::vector<block> okvsTable, std::vector<block>& decodeValues, u64 type_okvs, u64 type_security)
+{
+	decodeValues.resize(inputSet.size(), ZeroBlock);
+	
+	//for (u64 idxParty = 0; idxParty < okvsTables.size(); idxParty++)
+	{
+		if (type_okvs == GbfOkvs)
+			GbfDecode(okvsTable, inputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
+		else if (type_okvs == PolyOkvs)
+			PolyDecode(okvsTable, inputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
+
+		
+	}
+
+	/*std::cout << IoStream::lock;
+	for (u64 i = 0; i < 2; i++)
+		std::cout << inputSet2PSI[i] << " - decode partyn - " << i << std::endl;
+	std::cout << IoStream::unlock;*/
+
+	//for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem)
+	//	inputSet2PSI[idxItem] = inputSet2PSI[idxItem] ^ inputSet[idxItem]; //simulate x||F(x) xor all decodes
+}
+
+
 //for server t->n: compute XOR F(key_user, value)
 inline void server_prf(const std::vector<block> inputSet, const std::vector<block> aesKeys, std::vector<block>& inputSet2ZeroXOR, u64 type_okvs, u64 type_security)
 {
@@ -378,7 +403,7 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 		if (myIdx == leaderIdx)
 		{
 
-			//if (!isNTLThreadSafe && (bins.mOpt == 1 || bins.mOpt == 2))
+			if (!isNTLThreadSafe && (bins.mOpt == 1 || bins.mOpt == 2))
 			{//since NTL does not support thread safe => running in pipeline for poly-based-OPPRF
 				for (u64 pIdx = 0; pIdx < nPartiesZeroXor - 1; ++pIdx)
 				{
@@ -392,20 +417,20 @@ inline void zeroXOR_party(u64 myIdx, u64 nPartiesZeroXor, u64 nParties, const st
 					}
 				}
 			}
-			//else {
+			else {
 
-			//	std::vector<std::thread>  pThrds(nPartiesZeroXor - 1);
-			//	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
-			//	{
+				std::vector<std::thread>  pThrds(nPartiesZeroXor - 1);
+				for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+				{
 
-			//		pThrds[pIdx] = std::thread([&, pIdx]() {
-			//			if (pIdx != leaderIdx)
-			//				recv[pIdx].recvSS(pIdx, bins, recvPayLoads[pIdx], chls[pIdx + chl_idx_shift]);
-			//			});
-			//	}
-			//	for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
-			//		pThrds[pIdx].join();
-			//}
+					pThrds[pIdx] = std::thread([&, pIdx]() {
+						if (pIdx != leaderIdx)
+							recv[pIdx].recvSS(pIdx, bins, recvPayLoads[pIdx], chls[pIdx + chl_idx_shift]);
+						});
+				}
+				for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+					pThrds[pIdx].join();
+			}
 
 		
 		
@@ -586,6 +611,7 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 	u64 num_threads = nParties - 1; //for party 1
 
 	timer.reset();
+
 	auto timer_start = timer.setTimePoint("start");
 
 
@@ -593,7 +619,7 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 	std::vector<block> aesSentKeys(nParties); // each users generates aes key. Indeed, we only use aesKeys[t->n]
 	std::vector<block> aesReceivedKeys(party_t_id); // Indeed, we only use aesKeys[0->t-1]
 
-	std::vector<block> inputSet2ZeroXOR(setSize); //for party n-1 and n
+	std::vector<block> inputSet2ZeroXOR(setSize,ZeroBlock); //for party n-1 and n
 
 
 	//====================================
@@ -606,9 +632,9 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 			aesSentKeys[i] = prng.get<block>(); //generating aes keys
 			chls[i][0]->asyncSend(&aesSentKeys[i], sizeof(block)); //sending aesKeys[i] to party [t->n]
 		
-			std::cout << IoStream::lock;
+			//std::cout << IoStream::lock;
 			//std::cout << aesSentKeys[i] << " - aesKeys[" << i << "] - myIdx" << myIdx << std::endl;
-			std::cout << IoStream::unlock;
+			//std::cout << IoStream::unlock;
 		}
 	}
 
@@ -617,9 +643,9 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 		for (u64 i = 0; i < party_t_id; ++i)
 		{
 			chls[i][0]->recv(&aesReceivedKeys[i], sizeof(block));  //party [t->n] receives aesKey from party [0->t-1]
-			std::cout << IoStream::lock;
+			//std::cout << IoStream::lock;
 			//std::cout << aesReceivedKeys[i] << " - aesReceivedKey[" <<i<<"] - myIdx" << myIdx << std::endl;
-			std::cout << IoStream::unlock;
+			//std::cout << IoStream::unlock;
 		}
 	}
 
@@ -631,11 +657,15 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 	std::cout << inputSet[0] << " - inputSet - " << myIdx  << std::endl;
 	std::cout << IoStream::unlock;*/
 
+	auto timer_asekey_done= timer.setTimePoint("asekey_done");
+
 	if (myIdx < party_t_id) //user computes XOR of all F(k, value) and encodes them before sending to party_t
 	{
 		std::vector<block> okvsTable; //okvs of party1
 		user_encode(inputSet, aesSentKeys, okvsTable, party_t_id, nParties, type_okvs, type_security);
 		chls[party_t_id][0]->send(okvsTable.data(), okvsTable.size() * sizeof(block)); //sending okvsTable to party_t
+
+		auto timer_encode_done = timer.setTimePoint("distribute_done");
 
 	/*	std::cout << IoStream::lock;
 		for (u64 i = 0; i < okvsTable1.size(); i++)
@@ -646,19 +676,36 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 	
 	else if (myIdx == party_t_id) //combined party
 	{
+		std::vector<block> hashInputSet(inputSet.size());
+		hashInputSet = inputSet;
+		if (type_security == secMalicious)
+			mAesFixedKey.ecbEncBlocks(inputSet.data(), inputSet.size(), hashInputSet.data()); //H(xi)
+
+
 		std::vector <std::vector<block>> okvsTables(party_t_id); //okvs of party 0->t
-		for (u64 idxParty = 0; idxParty < party_t_id; idxParty++)
+		std::vector <std::vector<block>> decOkvsTables(party_t_id); //okvs of party 0->t
+
+
+		std::vector<std::thread>  pThrds(party_t_id);
+		for (u64 idxParty = 0; idxParty < pThrds.size(); ++idxParty)
 		{
-			okvsTables[idxParty].resize(okvsTableSize);
-			chls[idxParty][0]->recv(okvsTables[idxParty].data(), okvsTables[idxParty].size() * sizeof(block)); //receving okvsTable from party 0->t
-
-			/*std::cout << IoStream::lock;
-			for (u64 i = 0; i < 4; i++)
-				std::cout << okvsTables[idxParty][i] << " - okvsTable party2_encode - " << myIdx << " <-" << idxParty + 1 << std::endl;
-			std::cout << IoStream::unlock;*/
+			pThrds[idxParty] = std::thread([&, idxParty]() {
+				okvsTables[idxParty].resize(okvsTableSize);
+				chls[idxParty][0]->recv(okvsTables[idxParty].data(), okvsTables[idxParty].size() * sizeof(block)); //receving okvsTable from party 0->t
+				partyt_decode(hashInputSet, okvsTables[idxParty], decOkvsTables[idxParty], type_okvs, type_security);
+				});
 		}
+		for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+			pThrds[pIdx].join();
 
-		partyt_decode(inputSet, okvsTables, inputSet2ZeroXOR, type_okvs, type_security);
+		for (u64 idxParty = 0; idxParty < pThrds.size(); ++idxParty)
+			for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem)
+				inputSet2ZeroXOR[idxItem] = decOkvsTables[idxParty][idxItem] ^ inputSet2ZeroXOR[idxItem];  //xor all values 
+
+
+		//partyt_decode(inputSet, okvsTables, inputSet2ZeroXOR, type_okvs, type_security);
+
+		auto timer_encode_done = timer.setTimePoint("distribute_done");
 
 		/*std::cout << IoStream::lock;
 		for (u64 i = 0; i < 2; i++)
@@ -671,6 +718,8 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 		std::vector<block> okvsTable; //okvs of each party 2 -> n-2
 		server_prf(inputSet, aesReceivedKeys, inputSet2ZeroXOR, type_okvs, type_security);
 	
+		auto timer_encode_done = timer.setTimePoint("distribute_done");
+
 		/*std::cout << IoStream::lock;
 		for (u64 i = 0; i < 4; i++)
 			std::cout << okvsTable[i] << " - okvsTable party2_encode: " << myIdx << " ->"<< party_n1 <<std::endl;
@@ -702,13 +751,21 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 	}
 	auto timer_end = timer.setTimePoint("end");
 
-	if (myIdx == party_t_id) {
+	if (myIdx == 0)
+	{
+		std::cout << "Client running time: \n";
+		std::cout << timer << std::endl;
+	}
 
-		auto totalTime_client = std::chrono::duration_cast<std::chrono::milliseconds>(timer_server_start - timer_start).count();
+	if (myIdx == party_t_id) {
+		std::cout << "party t running time: \n";
+		std::cout << timer << std::endl;
+
+	/*	auto totalTime_client = std::chrono::duration_cast<std::chrono::milliseconds>(timer_server_start - timer_start).count();
 		auto totalTime_server = std::chrono::duration_cast<std::chrono::milliseconds>(timer_end - timer_server_start).count();
 
 		std::cout << "totalTime_client: " << totalTime_client << "\n";
-		std::cout << "totalTime_server: " << totalTime_server << "\n";
+		std::cout << "totalTime_server: " << totalTime_server << "\n";*/
 
 		/*auto offlineTime = std::chrono::duration_cast<std::chrono::milliseconds>(initDone - start).count();
 		auto hashingTime = std::chrono::duration_cast<std::chrono::milliseconds>(hashingDone - initDone).count();
@@ -734,6 +791,11 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 			<< "------------------\n";*/
 	}
 	
+	if (myIdx == nParties-1)
+	{
+		std::cout << "last party running time: \n";
+		std::cout << timer << std::endl;
+	}
 
 	//close chanels 
 	for (u64 i = 0; i < nParties; ++i)

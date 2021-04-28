@@ -12,6 +12,9 @@
 #define secMalicious 0
 #define secSemiHonest 1
 
+#define okvsHashFunctions 40
+#define okvsLengthScale 60
+
 #define isNTLThreadSafe 0
 
 void InitDebugPrinting(std::string file = "../testoutput.txt");

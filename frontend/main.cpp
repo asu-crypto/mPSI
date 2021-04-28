@@ -106,7 +106,7 @@ int main(int argc, char** argv)
 		if (argv[7][0] == '-' && argv[7][1] == 'p') 
 		{	
 			u64 pIdx = atoi(argv[8]);
-			cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
+			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
 			tpsi_party(pIdx, nParties, tParties, setSize, GbfOkvs, secSemiHonest);
 		}
 		else

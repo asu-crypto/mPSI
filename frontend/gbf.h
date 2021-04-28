@@ -12,15 +12,18 @@
 
 using namespace osuCrypto;
 
+
 inline void GbfEncode(const std::vector<std::pair<block, block>> key_values, std::vector<block>& garbledBF)
 {
-	u64 numHashFunctions = 40;
+	u64 setSize = key_values.size();
+	u64 mBfBitCount = okvsLengthScale * setSize;
+	u64 numHashFunctions = okvsHashFunctions;
+
 	std::vector<AES> mBFHasher(numHashFunctions);
 	for (u64 i = 0; i < mBFHasher.size(); ++i)
 		mBFHasher[i].setKey(_mm_set1_epi64x(i));
 
-	u64 setSize = key_values.size();
-	u64 mBfBitCount = 60 * setSize;
+	
 	garbledBF.resize(mBfBitCount,ZeroBlock);
 	PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 
@@ -104,13 +107,14 @@ inline  void GbfEncode(const std::vector<block> setKeys, const std::vector<block
 
 inline  void GbfDecode(const std::vector<block> garbledBF, const std::vector<block> setKeys, std::vector<block>& setValues)
 {
-	u64 numHashFunctions = 40;
+	u64 setSize = setKeys.size();
+	u64 mBfBitCount = okvsLengthScale * setSize;
+	u64 numHashFunctions = okvsHashFunctions;
+
 	std::vector<AES> mBFHasher(numHashFunctions);
 	for (u64 i = 0; i < mBFHasher.size(); ++i)
 		mBFHasher[i].setKey(_mm_set1_epi64x(i));
 
-	u64 setSize = setKeys.size();
-	u64 mBfBitCount = 60 * setSize;
 	setValues.resize(setSize);
 
 	for (u64 i = 0; i < setSize; ++i)
