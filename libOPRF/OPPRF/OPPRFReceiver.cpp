@@ -2153,7 +2153,7 @@ namespace osuCrypto
 				//	auto& msk = *(u64*)&(maskBFView[k]).data();
 				//	auto& blk = *(block*)&(maskBFView[k]);
 
-					std::cout <<k << " - " << toBlock(shortcut) << " maskBFView\n";
+				//	std::cout <<k << " - " << toBlock(shortcut) << " maskBFView\n";
 					// check 64 first bits
 					auto match = localMasks[hIdx].find(shortcut);
 

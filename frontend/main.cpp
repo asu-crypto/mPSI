@@ -16,6 +16,7 @@ using namespace osuCrypto;
 #include "gbf.h"
 #include "o1party.h"
 #include "tpsi.h"
+#include "psi3.h"
 //int miraclTestMain();
 
 
@@ -37,9 +38,12 @@ int main(int argc, char** argv)
 	//party2psi_Test_Main();
 	//tpsi_test(GbfOkvs, secSemiHonest);
 	
+	/*nPSI3_Test();
+	O1nPSI_Test();
+	return 0;*/
 	//============
 	/*O1nPSI_Test();
-	nPSI3_Test();
+	
 	nPSI2_server_aided_Test();*/
 	/*tPSI_Test();
 
@@ -74,6 +78,30 @@ int main(int argc, char** argv)
 			tPSI_Test();
 		break;
 
+
+	case 5: //3psi
+		if (argv[1][0] == '-' && argv[1][1] == 'm')
+			setSize = 1 << atoi(argv[2]);
+		else
+		{
+			cout << "setSize: wrong format\n";
+			usage(argv[0]);
+			return 0;
+		}
+
+		if (argv[3][0] == '-' && argv[3][1] == 'p')
+		{
+			u64 pIdx = atoi(argv[4]);
+			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
+			party_psi3(pIdx, setSize, GbfOkvs, secSemiHonest);
+		}
+		else
+		{
+			cout << "pIdx: wrong format\n";
+			usage(argv[0]);
+			return 0;
+		}
+		break;
 	case 9: //tPSI 
 		//cout << "9\n";
 

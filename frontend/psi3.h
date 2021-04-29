@@ -132,7 +132,7 @@ inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 			OPPRFReceiver recv;
 			binSet bins;
 
-			bins.init(myIdx, 2, setSize, psiSecParam, 0);
+			bins.init(myIdx, 2, setSize, psiSecParam, 0,1);
 			u64 otCountSend = bins.mSimpleBins.mBins.size();
 			u64 otCountRecv = bins.mCuckooBins.mBins.size();
 
@@ -191,7 +191,7 @@ inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 			OPPRFReceiver recv;
 			binSet bins;
 
-			bins.init(myIdx, 2, setSize, psiSecParam, 1, 1);
+			bins.init(myIdx, 2, setSize, psiSecParam, 0, 1);
 			//	bins.mMaskSize = 8;
 			u64 otCountSend = bins.mSimpleBins.mBins.size();
 			u64 otCountRecv = bins.mCuckooBins.mBins.size();
@@ -232,13 +232,17 @@ inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 
 			if (myIdx == 2) {
 				Log::out << "mIntersection.size(): " << recv.mIntersection.size() << Log::endl;
-				for (u64 i = 0; i < recv.mIntersection.size(); ++i)
+				/*for (u64 i = 0; i < recv.mIntersection.size(); ++i)
 				{
 					std::cout << recv.mIntersection[i] << " - " << inputSet[recv.mIntersection[i]] << std::endl;
 
-				}
+				}*/
 			}
 		}
+		auto timer_end = timer.setTimePoint("end");
+
+		if (myIdx == 2)
+			std::cout << timer << std::endl;
 
 
 		//close chanels 
