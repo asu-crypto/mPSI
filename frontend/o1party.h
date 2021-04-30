@@ -212,7 +212,6 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 #pragma region setup
 	u64  psiSecParam = 40, bitSize = 128, numChannelThreads = 1, okvsTableSize = setSize;
 	u64 party_n1 = nParties - 2, party_n = nParties - 1; //party n-1 vs n
-	double dataSent, Mbps, MbpsRecv, dataRecv;
 	Timer timer;
 	PRNG prng(_mm_set_epi32(4253465, 3434565, myIdx, myIdx));
 	u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
@@ -352,10 +351,10 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 
 		partyn1_decode(inputSet, aesReceivedKey, okvsTables, inputSet2PSI, type_okvs, type_security);
 
-		std::cout << IoStream::lock;
+		/*std::cout << IoStream::lock;
 		for (u64 i = 0; i < 2; i++)
 			std::cout << inputSet2PSI[i] << " - inputSet2PSI-n1 " << myIdx << std::endl;
-		std::cout << IoStream::unlock;
+		std::cout << IoStream::unlock;*/
 	}
 	else if (myIdx == party_n)
 	{
@@ -370,14 +369,16 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 
 		partyn_decode(inputSet, okvsTable, inputSet2PSI, type_okvs, type_security);
 
-		std::cout << IoStream::lock;
+		/*std::cout << IoStream::lock;
 		for (u64 i = 0; i < 2; i++)
 			std::cout << inputSet2PSI[i] << " - inputSet2PSI-n " << myIdx << std::endl;
-		std::cout << IoStream::unlock;
+		std::cout << IoStream::unlock;*/
 	}
 
 	//====================================
 	//============compute 2psi========
+
+	auto timmer_2psi = timer.setTimePoint("2psi_start");
 
 	if (myIdx == party_n1 || myIdx == party_n) //for 2psi
 	{
@@ -387,7 +388,7 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 		OPPRFReceiver recv;
 		binSet bins;
 
-		bins.init(myIdx, 2, setSize, psiSecParam, 1, 1);
+		bins.init(myIdx, 2, setSize, psiSecParam, 0, 1);
 		//	bins.mMaskSize = 8;
 		u64 otCountSend = bins.mSimpleBins.mBins.size();
 		u64 otCountRecv = bins.mCuckooBins.mBins.size();
@@ -456,14 +457,32 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 
 		if (myIdx == party_n) {
 			Log::out << "mIntersection.size(): " << recv.mIntersection.size() << Log::endl;
-			for (u64 i = 0; i < recv.mIntersection.size(); ++i)
+			/*for (u64 i = 0; i < recv.mIntersection.size(); ++i)
 			{
 				std::cout << recv.mIntersection[i] << " - " << inputSet[recv.mIntersection[i]] << std::endl;
 
-			}
+			}*/
 		}
 	}
 
+	auto timmer_end = timer.setTimePoint("end");
+	if (myIdx == party_n)
+		std::cout << timer << std::endl;
+
+	double dataSent = 0, dataRecv = 0, Mbps = 0, MbpsRecv = 0;
+	for (u64 i = 0; i < nParties; ++i)
+	{
+		if (i != myIdx) {
+			//chls[i].resize(numThreads);
+			dataSent += chls[i][0]->getTotalDataSent();
+			dataRecv += chls[i][0]->getTotalDataRecv();
+		}
+	}
+
+	if (myIdx == party_n || myIdx == party_n1)
+		std::cout << "party #" << myIdx << "\t Recv omm: " << ((dataRecv) / std::pow(2.0, 20)) << " MB" << std::endl;
+
+	//total comm cost= (party_n+party_n1)
 
 	//close chanels 
 	for (u64 i = 0; i < nParties; ++i)

@@ -16,8 +16,6 @@
 ./bin/frontend.exe -m 20 -n 10 -t 4 -p 0 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 1 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 2 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 3 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 4 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 5 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 6 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 7 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 8 & ./bin/frontend.exe -m 20 -n 10 -t 4 -p 9
 
 
-./bin/frontend.exe -m 24 -n 10 -t 4 -p 0 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 1 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 2 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 3 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 4 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 5 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 6 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 7 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 8 & ./bin/frontend.exe -m 24 -n 10 -t 4 -p 9
-
 
 
 10,7

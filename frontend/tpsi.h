@@ -554,7 +554,6 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 #pragma region setup
 	u64  psiSecParam = 40, bitSize = 128, numChannelThreads = 1, okvsTableSize = setSize;
 	u64 party_n = nParties - 1; //party n-1 vs n
-	double dataSent, Mbps, MbpsRecv, dataRecv;
 	Timer timer;
 	PRNG prng(_mm_set_epi32(4253465, 3434565, myIdx, myIdx));
 	u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
@@ -751,15 +750,37 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 	}
 	auto timer_end = timer.setTimePoint("end");
 
+	double dataSent = 0, dataRecv = 0, Mbps = 0, MbpsRecv = 0;
+	for (u64 i = 0; i < nParties; ++i)
+	{
+		if (i != myIdx) {
+			//chls[i].resize(numThreads);
+			if (myIdx == nParties - 1 && i == party_t_id)
+			{
+				//total communication cost is ~party_t(recv+sent) + (partyn-1)(recv+sent) 
+				//the above calculation consists of 2x the comm cost btw party_t and partyn-1
+				// Thus, we do nothing here 
+			}
+			else {
+				dataSent += chls[i][0]->getTotalDataSent();
+				dataRecv += chls[i][0]->getTotalDataRecv();
+			}
+		}
+
+	}
+
 	if (myIdx == 0)
 	{
 		std::cout << "Client running time: \n";
 		std::cout << timer << std::endl;
+		std::cout << "Comm: " << ((dataSent + dataRecv )/ std::pow(2.0, 20)) << " MB" << std::endl;
 	}
 
 	if (myIdx == party_t_id) {
 		std::cout << "party t running time: \n";
 		std::cout << timer << std::endl;
+		std::cout << "Comm: " << ((dataSent + dataRecv) / std::pow(2.0, 20)) << " MB" << std::endl;
+
 
 	/*	auto totalTime_client = std::chrono::duration_cast<std::chrono::milliseconds>(timer_server_start - timer_start).count();
 		auto totalTime_server = std::chrono::duration_cast<std::chrono::milliseconds>(timer_end - timer_server_start).count();
@@ -795,7 +816,14 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 	{
 		std::cout << "last party running time: \n";
 		std::cout << timer << std::endl;
+		std::cout << "Comm: " << ((dataSent + dataRecv) / std::pow(2.0, 20)) << " MB" << std::endl;
+
 	}
+	
+	
+
+	//total communication cost is ~party_t + (partyn-1)
+
 
 	//close chanels 
 	for (u64 i = 0; i < nParties; ++i)

@@ -102,6 +102,42 @@ int main(int argc, char** argv)
 			return 0;
 		}
 		break;
+
+	case 7:
+		if (argv[1][0] == '-' && argv[1][1] == 'm')
+			setSize = 1 << atoi(argv[2]);
+		else
+		{
+			cout << "setSize: wrong format\n";
+			usage(argv[0]);
+			return 0;
+		}
+
+		if (argv[3][0] == '-' && argv[3][1] == 'n')
+			nParties = atoi(argv[4]);
+		else
+		{
+			cout << "nParties: wrong format\n";
+			usage(argv[0]);
+			return 0;
+		}
+
+		if (argv[5][0] == '-' && argv[5][1] == 'p')
+		{
+			u64 pIdx = atoi(argv[6]);
+			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
+			partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
+		}
+		else
+		{
+			cout << "pIdx: wrong format\n";
+			usage(argv[0]);
+			return 0;
+		}
+
+		break;
+		
+
 	case 9: //tPSI 
 		//cout << "9\n";
 

@@ -4,4 +4,3 @@
 
 ./bin/frontend.exe -m 20 -p 0 & ./bin/frontend.exe -m 20 -p 1 & ./bin/frontend.exe -m 20 -p 2
 
-./bin/frontend.exe -m 20 -p 0 & ./bin/frontend.exe -m 20 -p 1 & ./bin/frontend.exe -m 20 -p 2

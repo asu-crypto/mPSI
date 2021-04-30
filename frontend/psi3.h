@@ -24,7 +24,6 @@ inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 
 #pragma region setup
 		u64  psiSecParam = 40, bitSize = 128, numChannelThreads = 1, okvsTableSize = setSize;
-		double dataSent, Mbps, MbpsRecv, dataRecv;
 		Timer timer;
 		PRNG prng(_mm_set_epi32(4253465, 3434565, myIdx, myIdx));
 		u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
@@ -241,8 +240,24 @@ inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 		}
 		auto timer_end = timer.setTimePoint("end");
 
+		double dataSent = 0, dataRecv = 0, Mbps = 0, MbpsRecv = 0;
+		for (u64 i = 0; i < nParties; ++i)
+		{
+			if (i != myIdx) {
+				//chls[i].resize(numThreads);
+					dataSent += chls[i][0]->getTotalDataSent();
+					dataRecv += chls[i][0]->getTotalDataRecv();
+			}
+		}
+
+
 		if (myIdx == 2)
 			std::cout << timer << std::endl;
+
+		std::cout << "party #"<<myIdx<< "\t Comm: " << ((dataSent + dataRecv) / std::pow(2.0, 20)) << " MB" << std::endl;
+		//total comm cost= (p1+p2+p3)/2
+
+
 
 
 		//close chanels 
@@ -266,7 +281,6 @@ inline void party_psi2_server_aided(u64 myIdx, u64 setSize, u64 type_security)
 
 #pragma region setup
 		u64  psiSecParam = 40, bitSize = 128, numChannelThreads = 1, okvsTableSize = setSize;
-		double dataSent, Mbps, MbpsRecv, dataRecv;
 		Timer timer;
 		PRNG prng(_mm_set_epi32(4253465, 3434565, myIdx, myIdx));
 		u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
