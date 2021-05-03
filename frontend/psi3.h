@@ -13,6 +13,7 @@
 #include "NChooseOne/KkrtNcoOtSender.h"
 #include "OPPRF/OPPRFReceiver.h"
 #include "OPPRF/OPPRFSender.h"
+#include <Common/ByteStream.h>
 
 using namespace osuCrypto;
 
@@ -283,7 +284,7 @@ inline void party_psi2_server_aided(u64 myIdx, u64 setSize, u64 type_security)
 		u64  psiSecParam = 40, bitSize = 128, numChannelThreads = 1, okvsTableSize = setSize;
 		Timer timer;
 		PRNG prng(_mm_set_epi32(4253465, 3434565, myIdx, myIdx));
-		u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
+		u64 expected_intersection = rand()%setSize;// (*(u64*)&prng.get<block>()) % setSize;
 		std::vector<u32> mIntersection;
 
 		std::string name("psi");
@@ -357,6 +358,8 @@ inline void party_psi2_server_aided(u64 myIdx, u64 setSize, u64 type_security)
 			party1_AES.ecbEncBlocks(inputSet.data(), inputSet.size(), ciphertexts[0].data()); //compute F_ki(xi)
 			//shuffle(ciphertexts[0].begin(), ciphertexts[0].end(), prngSame); //
 			
+			shuffle(ciphertexts[0].begin(), ciphertexts[0].end(), prng);
+
 			chls[2][0]->asyncSend(ciphertexts[0].data(), ciphertexts[0].size()*sizeof(block)); //send pi(F_ki(xi)) to server (party 3)
 
 			/*std::cout << IoStream::lock;
@@ -373,6 +376,8 @@ inline void party_psi2_server_aided(u64 myIdx, u64 setSize, u64 type_security)
 			AES party2_AES(aesKeys[1]);
 			party2_AES.ecbEncBlocks(inputSet.data(), inputSet.size(), ciphertexts[1].data()); //compute F_ki(xi)
 			//shuffle(ciphertexts[1].begin(), ciphertexts[1].end(), prngDiff);
+
+			shuffle(ciphertexts[1].begin(), ciphertexts[1].end(), prng);
 
 			chls[2][0]->asyncSend(ciphertexts[1].data(), ciphertexts[1].size() * sizeof(block)); // send pi(F_ki(xi)) to server (party 3)
 
@@ -419,17 +424,46 @@ inline void party_psi2_server_aided(u64 myIdx, u64 setSize, u64 type_security)
 			}
 			Log::out << "mIntersection.size(): " << mIntersection.size() << Log::endl;
 
-			//Skip this steps
-			//chls[0][0]->asyncSend(mIntersection.data(), mIntersection.size() * sizeof(u32)); // send index of the intersection
-			//chls[1][0]->asyncSend(mIntersection.data(), mIntersection.size() * sizeof(u32)); // send index of the intersection
+			
 		}
 
+		if (myIdx == 2)
+		{	//Skip this steps
+
+			chls[0][0]->asyncSend(mIntersection.data(), mIntersection.size() * sizeof(u32)); // send index of the intersection
+			//chls[1][0]->asyncSend(mIntersection.data(), mIntersection.size() * sizeof(u32)); // send index of the intersection
+		}
+		 else if (myIdx==0)
+		{
+			ByteStream maskBuffer;
+			chls[2][0]->recv(maskBuffer);
+		}
 		//if (myIdx == 0 || myIdx == 1)
 		//{
 		//	chls[2][0]->recv(mIntersection.data(),mIntersection.size() * sizeof(u32)); // receive pi(F_ki(xi)) from party 1
 		//}
 	
+		auto end = timer.setTimePoint("end");
 
+		double dataSent = 0, dataRecv = 0, Mbps = 0, MbpsRecv = 0;
+		for (u64 i = 0; i < nParties; ++i)
+		{
+			if (i != myIdx) {
+				//chls[i].resize(numThreads);
+				dataSent += chls[i][0]->getTotalDataSent();
+				dataRecv += chls[i][0]->getTotalDataRecv();
+			}
+		}
+
+
+		if (myIdx == 2)
+		{
+			std::cout << timer << std::endl;
+			std::cout << "party #" << myIdx << "\t Comm: " << ((dataSent + dataRecv) / std::pow(2.0, 20)) << " MB" << std::endl;
+		}
+
+		//total comm cost = send+recv (server 3)
+		
 		//close chanels 
 		for (u64 i = 0; i < nParties; ++i)
 			if (i != myIdx)

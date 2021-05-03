@@ -37,7 +37,10 @@ int main(int argc, char** argv)
 	//party_test(PolyOkvs);
 	//party2psi_Test_Main();
 	//tpsi_test(GbfOkvs, secSemiHonest);
-	
+
+	//nPSI2_server_aided_Test();
+	//return 0;
+
 	/*nPSI3_Test();
 	O1nPSI_Test();
 	return 0;*/
@@ -78,6 +81,31 @@ int main(int argc, char** argv)
 			tPSI_Test();
 		break;
 
+	case 6: //2psi with server-aider
+		if (argv[1][0] == '-' && argv[1][1] == 'm')
+			setSize = 1 << atoi(argv[2]);
+		else
+		{
+			cout << "setSize: wrong format\n";
+			usage(argv[0]);
+			return 0;
+		}
+		if (argv[5][0] == '2' && argv[5][1] == 'p' && argv[5][2] == 's' && argv[5][3] == 'i')
+			if (argv[3][0] == '-' && argv[3][1] == 'p')
+			{
+				u64 pIdx = atoi(argv[4]);
+				//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
+				if(pIdx==1)
+					cout << "party_psi2_server_aided\n";
+				party_psi2_server_aided(pIdx, setSize, secSemiHonest);
+			}
+		else
+		{
+			cout << "pIdx: wrong format\n";
+			usage(argv[0]);
+			return 0;
+		}
+		break;
 
 	case 5: //3psi
 		if (argv[1][0] == '-' && argv[1][1] == 'm')
@@ -93,7 +121,8 @@ int main(int argc, char** argv)
 		{
 			u64 pIdx = atoi(argv[4]);
 			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
-			party_psi3(pIdx, setSize, GbfOkvs, secSemiHonest);
+			//party_psi3(pIdx, setSize, GbfOkvs, secSemiHonest);
+			party_psi2_server_aided(pIdx, setSize,secSemiHonest);
 		}
 		else
 		{

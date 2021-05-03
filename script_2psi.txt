@@ -1,0 +1,6 @@
+./bin/frontend.exe -m 12 -p 0 2psi & ./bin/frontend.exe -m 12 -p 1 2psi & ./bin/frontend.exe -m 12 -p 2 2psi
+
+./bin/frontend.exe -m 16 -p 0 2psi & ./bin/frontend.exe -m 16 -p 1 2psi & ./bin/frontend.exe -m 16 -p 2 2psi
+
+./bin/frontend.exe -m 20 -p 0 2psi & ./bin/frontend.exe -m 20 -p 1 2psi & ./bin/frontend.exe -m 20 -p 2 2psi
+
