@@ -1,10 +1,12 @@
+./bin/frontend.exe -m 8 -p 0 & ./bin/frontend.exe -m 8 -p 1 & ./bin/frontend.exe -m 8 -p 2
+
 ./bin/frontend.exe -m 12 -p 0 & ./bin/frontend.exe -m 12 -p 1 & ./bin/frontend.exe -m 12 -p 2
 
 ./bin/frontend.exe -m 16 -p 0 & ./bin/frontend.exe -m 16 -p 1 & ./bin/frontend.exe -m 16 -p 2
 
 ./bin/frontend.exe -m 20 -p 0 & ./bin/frontend.exe -m 20 -p 1 & ./bin/frontend.exe -m 20 -p 2
 
-./bin/frontend.exe -m 20 -p 0 & ./bin/frontend.exe -m 20 -p 1 & ./bin/frontend.exe -m 24 -p 2
+./bin/frontend.exe -m 24 -p 0 & ./bin/frontend.exe -m 24 -p 1 & ./bin/frontend.exe -m 24 -p 2
 
 ./bin/frontend.exe -m 20 -p 0 & ./bin/frontend.exe -m 20 -p 1 & ./bin/frontend.exe -m 28 -p 2
 

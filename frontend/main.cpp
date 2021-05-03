@@ -121,8 +121,8 @@ int main(int argc, char** argv)
 		{
 			u64 pIdx = atoi(argv[4]);
 			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
-			//party_psi3(pIdx, setSize, GbfOkvs, secSemiHonest);
-			party_psi2_server_aided(pIdx, setSize,secSemiHonest);
+			party_psi3(pIdx, setSize, GbfOkvs, secSemiHonest);
+			//party_psi2_server_aided(pIdx, setSize,secSemiHonest);
 		}
 		else
 		{
