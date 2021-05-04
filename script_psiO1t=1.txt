@@ -12,6 +12,14 @@
 ./bin/frontend.exe -m 20 -n 4 -p 0 & ./bin/frontend.exe -m 20 -n 4 -p 1 & ./bin/frontend.exe -m 20 -n 4 -p 2 & ./bin/frontend.exe -m 20 -n 4 -p 3
 
 
+./bin/frontend.exe -m 12 -n 4 -t 2 -p 0 & ./bin/frontend.exe -m 12 -n 4 -t 2 -p 1 & ./bin/frontend.exe -m 12 -n 4 -t 2 -p 2 & ./bin/frontend.exe -m 12 -n 4 -t 2 -p 3
+
+./bin/frontend.exe -m 16 -n 4 -t 2 -p 0 & ./bin/frontend.exe -m 16 -n 4 -t 2 -p 1 & ./bin/frontend.exe -m 16 -n 4 -t 2 -p 2 & ./bin/frontend.exe -m 16 -n 4 -t 2 -p 3
+
+./bin/frontend.exe -m 20 -n 4 -t 2 -p 0 & ./bin/frontend.exe -m 20 -n 4 -t 2 -p 1 & ./bin/frontend.exe -m 20 -n 4 -t 2 -p 2 & ./bin/frontend.exe -m 20 -n 4 -t 2 -p 3
+
+
+
 ./bin/frontend.exe -m 12 -n 4 -t 3 -p 0 & ./bin/frontend.exe -m 12 -n 4 -t 3 -p 1 & ./bin/frontend.exe -m 12 -n 4 -t 3 -p 2 & ./bin/frontend.exe -m 12 -n 4 -t 3 -p 3
 
 ./bin/frontend.exe -m 16 -n 4 -t 3 -p 0 & ./bin/frontend.exe -m 16 -n 4 -t 3 -p 1 & ./bin/frontend.exe -m 16 -n 4 -t 3 -p 2 & ./bin/frontend.exe -m 16 -n 4 -t 3 -p 3
@@ -31,12 +39,26 @@
 ./bin/frontend.exe -m 20 -n 5 -p 0 & ./bin/frontend.exe -m 20 -n 5 -p 1 & ./bin/frontend.exe -m 20 -n 5 -p 2 & ./bin/frontend.exe -m 20 -n 5 -p 3 & ./bin/frontend.exe -m 20 -n 5 -p 4
 
 
+
+./bin/frontend.exe -m 12 -n 5 -t 2 -p 0 & ./bin/frontend.exe -m 12 -n 5 -t 2 -p 1 & ./bin/frontend.exe -m 12 -n 5 -t 2 -p 2 & ./bin/frontend.exe -m 12 -n 5 -t 2 -p 3 & ./bin/frontend.exe -m 12 -n 5 -t 2 -p 4
+
+./bin/frontend.exe -m 16 -n 5 -t 2 -p 0 & ./bin/frontend.exe -m 16 -n 5 -t 2 -p 1 & ./bin/frontend.exe -m 16 -n 5 -t 2 -p 2 & ./bin/frontend.exe -m 16 -n 5 -t 2 -p 3 & ./bin/frontend.exe -m 16 -n 5 -t 2 -p 4
+
+./bin/frontend.exe -m 20 -n 5 -t 2 -p 0 & ./bin/frontend.exe -m 20 -n 5 -t 2 -p 1 & ./bin/frontend.exe -m 20 -n 5 -t 2 -p 2 & ./bin/frontend.exe -m 20 -n 5 -t 2 -p 3 & ./bin/frontend.exe -m 20 -n 5 -t 2 -p 4
+
+
 ./bin/frontend.exe -m 12 -n 5 -t 3 -p 0 & ./bin/frontend.exe -m 12 -n 5 -t 3 -p 1 & ./bin/frontend.exe -m 12 -n 5 -t 3 -p 2 & ./bin/frontend.exe -m 12 -n 5 -t 3 -p 3 & ./bin/frontend.exe -m 12 -n 5 -t 3 -p 4
 
 ./bin/frontend.exe -m 16 -n 5 -t 3 -p 0 & ./bin/frontend.exe -m 16 -n 5 -t 3 -p 1 & ./bin/frontend.exe -m 16 -n 5 -t 3 -p 2 & ./bin/frontend.exe -m 16 -n 5 -t 3 -p 3 & ./bin/frontend.exe -m 16 -n 5 -t 3 -p 4
 
 ./bin/frontend.exe -m 20 -n 5 -t 3 -p 0 & ./bin/frontend.exe -m 20 -n 5 -t 3 -p 1 & ./bin/frontend.exe -m 20 -n 5 -t 3 -p 2 & ./bin/frontend.exe -m 20 -n 5 -t 3 -p 3 & ./bin/frontend.exe -m 20 -n 5 -t 3 -p 4
 
+
+./bin/frontend.exe -m 12 -n 5 -t 4 -p 0 & ./bin/frontend.exe -m 12 -n 5 -t 4 -p 1 & ./bin/frontend.exe -m 12 -n 5 -t 4 -p 2 & ./bin/frontend.exe -m 12 -n 5 -t 4 -p 3 & ./bin/frontend.exe -m 12 -n 5 -t 4 -p 4
+
+./bin/frontend.exe -m 16 -n 5 -t 4 -p 0 & ./bin/frontend.exe -m 16 -n 5 -t 4 -p 1 & ./bin/frontend.exe -m 16 -n 5 -t 4 -p 2 & ./bin/frontend.exe -m 16 -n 5 -t 4 -p 3 & ./bin/frontend.exe -m 16 -n 5 -t 4 -p 4
+
+./bin/frontend.exe -m 20 -n 5 -t 4 -p 0 & ./bin/frontend.exe -m 20 -n 5 -t 4 -p 1 & ./bin/frontend.exe -m 20 -n 5 -t 4 -p 2 & ./bin/frontend.exe -m 20 -n 5 -t 4 -p 3 & ./bin/frontend.exe -m 20 -n 5 -t 4 -p 4
 
 
 
@@ -54,8 +76,40 @@
 ./bin/frontend.exe -m 20 -n 8 -t 3 -p 0 & ./bin/frontend.exe -m 20 -n 8 -t 3 -p 1 & ./bin/frontend.exe -m 20 -n 8 -t 3 -p 2 & ./bin/frontend.exe -m 20 -n 8 -t 3 -p 3 & ./bin/frontend.exe -m 20 -n 8 -t 3 -p 4 & ./bin/frontend.exe -m 20 -n 8 -t 3 -p 5 & ./bin/frontend.exe -m 20 -n 8 -t 3 -p 6 & ./bin/frontend.exe -m 20 -n 8 -t 3 -p 7
 
 
+./bin/frontend.exe -m 12 -n 8 -t 4 -p 0 & ./bin/frontend.exe -m 12 -n 8 -t 4 -p 1 & ./bin/frontend.exe -m 12 -n 8 -t 4 -p 2 & ./bin/frontend.exe -m 12 -n 8 -t 4 -p 3 & ./bin/frontend.exe -m 12 -n 8 -t 4 -p 4 & ./bin/frontend.exe -m 12 -n 8 -t 4 -p 5 & ./bin/frontend.exe -m 12 -n 8 -t 4 -p 6 & ./bin/frontend.exe -m 12 -n 8 -t 4 -p 7
+
+./bin/frontend.exe -m 16 -n 8 -t 4 -p 0 & ./bin/frontend.exe -m 16 -n 8 -t 4 -p 1 & ./bin/frontend.exe -m 16 -n 8 -t 4 -p 2 & ./bin/frontend.exe -m 16 -n 8 -t 4 -p 3 & ./bin/frontend.exe -m 16 -n 8 -t 4 -p 4 & ./bin/frontend.exe -m 16 -n 8 -t 4 -p 5 & ./bin/frontend.exe -m 16 -n 8 -t 4 -p 6 & ./bin/frontend.exe -m 16 -n 8 -t 4 -p 7
+
+./bin/frontend.exe -m 20 -n 8 -t 4 -p 0 & ./bin/frontend.exe -m 20 -n 8 -t 4 -p 1 & ./bin/frontend.exe -m 20 -n 8 -t 4 -p 2 & ./bin/frontend.exe -m 20 -n 8 -t 4 -p 3 & ./bin/frontend.exe -m 20 -n 8 -t 4 -p 4 & ./bin/frontend.exe -m 20 -n 8 -t 4 -p 5 & ./bin/frontend.exe -m 20 -n 8 -t 4 -p 6 & ./bin/frontend.exe -m 20 -n 8 -t 4 -p 7
 
 
+
+
+
+
+./bin/frontend.exe -m 12 -n 10 -p 0 & ./bin/frontend.exe -m 12 -n 10 -p 1 & ./bin/frontend.exe -m 12 -n 10 -p 2 & ./bin/frontend.exe -m 12 -n 10 -p 3 & ./bin/frontend.exe -m 12 -n 10 -p 4 & ./bin/frontend.exe -m 12 -n 10 -p 5 & ./bin/frontend.exe -m 12 -n 10 -p 6 & ./bin/frontend.exe -m 12 -n 10 -p 7 & ./bin/frontend.exe -m 12 -n 10 -p 8 & ./bin/frontend.exe -m 12 -n 10 -p 9 
+
+
+./bin/frontend.exe -m 16 -n 10 -p 0 & ./bin/frontend.exe -m 16 -n 10 -p 1 & ./bin/frontend.exe -m 16 -n 10 -p 2 & ./bin/frontend.exe -m 16 -n 10 -p 3 & ./bin/frontend.exe -m 16 -n 10 -p 4 & ./bin/frontend.exe -m 16 -n 10 -p 5 & ./bin/frontend.exe -m 16 -n 10 -p 6 & ./bin/frontend.exe -m 16 -n 10 -p 7 & ./bin/frontend.exe -m 16 -n 10 -p 8 & ./bin/frontend.exe -m 16 -n 10 -p 9 
+
+./bin/frontend.exe -m 20 -n 10 -p 0 & ./bin/frontend.exe -m 20 -n 10 -p 1 & ./bin/frontend.exe -m 20 -n 10 -p 2 & ./bin/frontend.exe -m 20 -n 10 -p 3 & ./bin/frontend.exe -m 20 -n 10 -p 4 & ./bin/frontend.exe -m 20 -n 10 -p 5 & ./bin/frontend.exe -m 20 -n 10 -p 6 & ./bin/frontend.exe -m 20 -n 10 -p 7 & ./bin/frontend.exe -m 20 -n 10 -p 8 & ./bin/frontend.exe -m 20 -n 10 -p 9 
+
+
+
+
+
+
+
+
+
+(15,1)
+
+./bin/frontend.exe -m 12 -n 15 -p 0 & ./bin/frontend.exe -m 12 -n 15 -p 1 & ./bin/frontend.exe -m 12 -n 15 -p 2 & ./bin/frontend.exe -m 12 -n 15 -p 3 & ./bin/frontend.exe -m 12 -n 15 -p 4 & ./bin/frontend.exe -m 12 -n 15 -p 5 & ./bin/frontend.exe -m 12 -n 15 -p 6 & ./bin/frontend.exe -m 12 -n 15 -p 7 & ./bin/frontend.exe -m 12 -n 15 -p 8 & ./bin/frontend.exe -m 12 -n 15 -p 9 & ./bin/frontend.exe -m 12 -n 15 -p 10 & ./bin/frontend.exe -m 12 -n 15 -p 11 & ./bin/frontend.exe -m 12 -n 15 -p 12 & ./bin/frontend.exe -m 12 -n 15 -p 13 & ./bin/frontend.exe -m 12 -n 15 -p 14
+
+
+./bin/frontend.exe -m 16 -n 15 -p 0 & ./bin/frontend.exe -m 16 -n 15 -p 1 & ./bin/frontend.exe -m 16 -n 15 -p 2 & ./bin/frontend.exe -m 16 -n 15 -p 3 & ./bin/frontend.exe -m 16 -n 15 -p 4 & ./bin/frontend.exe -m 16 -n 15 -p 5 & ./bin/frontend.exe -m 16 -n 15 -p 6 & ./bin/frontend.exe -m 16 -n 15 -p 7 & ./bin/frontend.exe -m 16 -n 15 -p 8 & ./bin/frontend.exe -m 16 -n 15 -p 9 & ./bin/frontend.exe -m 16 -n 15 -p 10 & ./bin/frontend.exe -m 16 -n 15 -p 11 & ./bin/frontend.exe -m 16 -n 15 -p 12 & ./bin/frontend.exe -m 16 -n 15 -p 13 & ./bin/frontend.exe -m 16 -n 15 -p 14
+
+./bin/frontend.exe -m 20 -n 15 -p 0 & ./bin/frontend.exe -m 20 -n 15 -p 1 & ./bin/frontend.exe -m 20 -n 15 -p 2 & ./bin/frontend.exe -m 20 -n 15 -p 3 & ./bin/frontend.exe -m 20 -n 15 -p 4 & ./bin/frontend.exe -m 20 -n 15 -p 5 & ./bin/frontend.exe -m 20 -n 15 -p 6 & ./bin/frontend.exe -m 20 -n 15 -p 7 & ./bin/frontend.exe -m 20 -n 15 -p 8 & ./bin/frontend.exe -m 20 -n 15 -p 9 & ./bin/frontend.exe -m 20 -n 15 -p 10 & ./bin/frontend.exe -m 20 -n 15 -p 11 & ./bin/frontend.exe -m 20 -n 15 -p 12 & ./bin/frontend.exe -m 20 -n 15 -p 13 & ./bin/frontend.exe -m 20 -n 15 -p 14
 
 
 
@@ -66,6 +120,9 @@
 ./bin/frontend.exe -m 16 -n 16 -p 0 & ./bin/frontend.exe -m 16 -n 16 -p 1 & ./bin/frontend.exe -m 16 -n 16 -p 2 & ./bin/frontend.exe -m 16 -n 16 -p 3 & ./bin/frontend.exe -m 16 -n 16 -p 4 & ./bin/frontend.exe -m 16 -n 16 -p 5 & ./bin/frontend.exe -m 16 -n 16 -p 6 & ./bin/frontend.exe -m 16 -n 16 -p 7 & ./bin/frontend.exe -m 16 -n 16 -p 8 & ./bin/frontend.exe -m 16 -n 16 -p 9 & ./bin/frontend.exe -m 16 -n 16 -p 10 & ./bin/frontend.exe -m 16 -n 16 -p 11 & ./bin/frontend.exe -m 16 -n 16 -p 12 & ./bin/frontend.exe -m 16 -n 16 -p 13 & ./bin/frontend.exe -m 16 -n 16 -p 14 & ./bin/frontend.exe -m 16 -n 16 -p 15
 
 ./bin/frontend.exe -m 20 -n 16 -p 0 & ./bin/frontend.exe -m 20 -n 16 -p 1 & ./bin/frontend.exe -m 20 -n 16 -p 2 & ./bin/frontend.exe -m 20 -n 16 -p 3 & ./bin/frontend.exe -m 20 -n 16 -p 4 & ./bin/frontend.exe -m 20 -n 16 -p 5 & ./bin/frontend.exe -m 20 -n 16 -p 6 & ./bin/frontend.exe -m 20 -n 16 -p 7 & ./bin/frontend.exe -m 20 -n 16 -p 8 & ./bin/frontend.exe -m 20 -n 16 -p 9 & ./bin/frontend.exe -m 20 -n 16 -p 10 & ./bin/frontend.exe -m 20 -n 16 -p 11 & ./bin/frontend.exe -m 20 -n 16 -p 12 & ./bin/frontend.exe -m 20 -n 16 -p 13 & ./bin/frontend.exe -m 20 -n 16 -p 14 & ./bin/frontend.exe -m 20 -n 16 -p 15
+
+
+
 
 
 ./bin/frontend.exe -m 12 -n 16 -t 3 -p 0 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 1 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 2 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 3 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 4 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 5 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 6 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 7 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 8 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 9 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 10 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 11 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 12 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 13 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 14 & ./bin/frontend.exe -m 12 -n 16 -t 3 -p 15
@@ -110,6 +167,14 @@
 ./bin/frontend.exe -m 16 -n 32 -t 8 -p 0 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 1 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 2 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 3 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 4 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 5 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 6 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 7 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 8 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 9 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 10 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 11 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 12 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 13 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 14 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 15 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 16 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 17 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 18 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 19 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 20 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 21 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 22 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 23 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 24 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 25 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 26 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 27 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 28 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 29 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 30 & ./bin/frontend.exe -m 16 -n 32 -t 8 -p 31
 
 ./bin/frontend.exe -m 20 -n 32 -t 8 -p 0 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 1 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 2 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 3 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 4 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 5 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 6 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 7 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 8 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 9 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 10 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 11 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 12 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 13 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 14 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 15 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 16 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 17 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 18 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 19 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 20 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 21 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 22 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 23 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 24 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 25 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 26 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 27 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 28 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 29 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 30 & ./bin/frontend.exe -m 20 -n 32 -t 8 -p 31
+
+
+./bin/frontend.exe -m 12 -n 32 -t 16 -p 0 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 1 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 2 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 3 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 4 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 5 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 6 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 7 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 8 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 9 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 10 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 11 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 12 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 13 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 14 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 15 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 16 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 17 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 18 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 19 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 20 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 21 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 22 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 23 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 24 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 25 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 26 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 27 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 28 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 29 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 30 & ./bin/frontend.exe -m 12 -n 32 -t 16 -p 31
+
+./bin/frontend.exe -m 16 -n 32 -t 16 -p 0 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 1 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 2 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 3 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 4 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 5 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 6 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 7 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 8 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 9 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 10 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 11 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 12 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 13 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 14 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 15 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 16 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 17 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 18 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 19 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 20 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 21 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 22 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 23 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 24 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 25 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 26 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 27 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 28 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 29 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 30 & ./bin/frontend.exe -m 16 -n 32 -t 16 -p 31
+
+./bin/frontend.exe -m 20 -n 32 -t 16 -p 0 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 1 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 2 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 3 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 4 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 5 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 6 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 7 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 8 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 9 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 10 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 11 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 12 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 13 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 14 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 15 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 16 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 17 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 18 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 19 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 20 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 21 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 22 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 23 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 24 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 25 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 26 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 27 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 28 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 29 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 30 & ./bin/frontend.exe -m 20 -n 32 -t 16 -p 31
+
 
 
 

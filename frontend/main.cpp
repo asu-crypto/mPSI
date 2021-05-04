@@ -30,6 +30,8 @@ void usage(const char* argv0)
 }
 int main(int argc, char** argv)
 {
+	//OPPRFn_Aug_EmptrySet_Test_Impl();
+	//return 0;
 	//InitDebugPrinting();
 //	GbfTest();
 //	return 0; 
@@ -39,6 +41,7 @@ int main(int argc, char** argv)
 	//tpsi_test(GbfOkvs, secSemiHonest);
 
 	//nPSI2_server_aided_Test();
+	//O1nPSI_Test();
 	//return 0;
 
 	/*nPSI3_Test();
@@ -53,6 +56,12 @@ int main(int argc, char** argv)
 
 
 	return 0;*/
+
+	//tPSI_Test();
+
+
+
+	//return 0;
 
 	//myCuckooTest_stash();
 	//Table_Based_Random_Test();
@@ -155,7 +164,12 @@ int main(int argc, char** argv)
 		{
 			u64 pIdx = atoi(argv[6]);
 			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
+
+			if (pIdx == 0)
+				cout << "partyO1 protocol\n";
+
 			partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
+			//aug_party(pIdx, nParties, setSize, 0, 1);
 		}
 		else
 		{

@@ -2613,7 +2613,7 @@ void aug_party(u64 myIdx, u64 nParties, u64 setSize,  u64 opt, u64 nTrials)
 				<< "ss2DirTime:  " << ssTime << " ms\n"
 				<< "intersection:  " << intersectionTime << " ms\n"
 				<< "onlineTime:  " << onlineTime << " ms\n"
-				//<< "Bandwidth: Send: " << Mbps << " Mbps,\t Recv: " << MbpsRecv << " Mbps\n"
+				<<"party #" << myIdx << "\t Recv omm: " << ((dataRecv+ dataSent) / std::pow(2.0, 20)) << " MB\n"
 				<< "Total time: " << time << " s\n";
 			//if (myIdx == clientdx)
 			//	std::cout << "Total Comm: Send:" << (dataSent / std::pow(2.0, 20)) << " MB"

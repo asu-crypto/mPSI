@@ -5,6 +5,7 @@
 #include "Common/Log1.h"
 #include <set>
 #include "gbf.h"
+#include <Common/ByteStream.h>
 
 using namespace osuCrypto;
 
@@ -214,7 +215,7 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 	u64 party_n1 = nParties - 2, party_n = nParties - 1; //party n-1 vs n
 	Timer timer;
 	PRNG prng(_mm_set_epi32(4253465, 3434565, myIdx, myIdx));
-	u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
+	u64 expected_intersection =3;// (*(u64*)&prng.get<block>()) % setSize;
 
 
 	if (type_okvs == GbfOkvs)
@@ -276,6 +277,7 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 	block aesReceivedKey; //aesKeys[0] for party 2
 
 	std::vector<block> inputSet2PSI(setSize); //for party n-1 and n
+
 
 
 	//====================================
@@ -380,6 +382,139 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 
 	auto timmer_2psi = timer.setTimePoint("2psi_start");
 
+	
+	u64 thirdpartyIdx = party_n1 - 1;
+
+	if (myIdx == party_n1 || myIdx == party_n || myIdx == thirdpartyIdx) //for 2psi with third party P0
+	{
+		std::vector<u32> mIntersection;
+		std::vector <block> aesKeys(2); // for party party_n and party_n1
+
+		if (myIdx == party_n1)
+		{
+			std::vector<block > ciphertexts(setSize);
+			//generating aes key and sends it to party party_n
+			aesKeys[1] = prng.get<block>();
+			chls[party_n][0]->asyncSend(&aesKeys[1], sizeof(block)); //sending aesKeys_party1 to party party_n 
+
+			AES party1_AES(aesKeys[1]);
+			party1_AES.ecbEncBlocks(inputSet2PSI.data(), inputSet2PSI.size(), ciphertexts.data()); //compute F_ki(xi)
+
+			shuffle(ciphertexts.begin(), ciphertexts.end(), prng);
+
+			chls[thirdpartyIdx][0]->send(ciphertexts.data(), ciphertexts.size() * sizeof(block)); //send pi(F_ki(xi)) to  third party 
+
+			std::cout << IoStream::lock;
+			std::cout << ciphertexts[0] << " - s ciphertexts[0]  - " << myIdx << std::endl;
+			std::cout << IoStream::unlock;
+		}
+	
+		if (myIdx == party_n)
+		{
+			std::vector<block > ciphertexts(setSize);
+
+			chls[party_n1][0]->recv(&aesKeys[0], sizeof(block));  //receiving aesKey from paty party_n1 
+
+														   //P2 computes encoding========
+			AES party2_AES(aesKeys[0]);
+			party2_AES.ecbEncBlocks(inputSet2PSI.data(), inputSet2PSI.size(), ciphertexts.data()); //compute F_ki(xi)
+
+			shuffle(ciphertexts.begin(), ciphertexts.end(), prng);
+
+
+			chls[thirdpartyIdx][0]->send(ciphertexts.data(), ciphertexts.size() * sizeof(block)); // send pi(F_ki(xi)) to  third party
+
+			/*std::cout << IoStream::lock;
+			for (u64 i = 0; i < expected_intersection + 2; ++i)
+				std::cout << ciphertexts[1][i] << " - ciphertexts[1][0]  - " << myIdx << std::endl;
+			std::cout << IoStream::unlock;*/
+
+		/*	std::cout << IoStream::lock;
+			std::cout << ciphertexts[0] << " - s ciphertexts[0][0]  - " << myIdx << std::endl;
+			std::cout << IoStream::unlock;*/
+		}
+	
+		if (myIdx == thirdpartyIdx) //third party
+		{
+
+			/*std::cout << IoStream::lock;
+			std::cout << " - thirdpartyIdx " << myIdx << std::endl;
+			std::cout << IoStream::unlock;*/
+
+
+			std::vector<std::vector<block>> recv_ciphertexts(2); //for server to receive pi(F(k, a)) form party party_n and party_n1
+			for (int i = 0; i < recv_ciphertexts.size(); i++)
+				recv_ciphertexts[i].resize(setSize);
+
+			//chls[party_n1][0]->recv(recv_ciphertexts[0].data(), setSize * sizeof(block)); // receive pi(F_ki(xi)) from party 1
+			//chls[party_n][0]->recv(recv_ciphertexts[1].data(), setSize * sizeof(block)); // receive pi(F_ki(xi)) from party 1
+
+			std::vector<std::thread>  pThrds(2);
+			for (u64 idxParty = 0; idxParty < pThrds.size(); ++idxParty)
+			{
+				pThrds[idxParty] = std::thread([&, idxParty]() {
+					chls[party_n- idxParty][0]->recv(recv_ciphertexts[idxParty].data(), setSize * sizeof(block)); // receive pi(F_ki(xi)) from party 1
+
+					});
+			}
+			for (u64 pIdx = 0; pIdx < pThrds.size(); ++pIdx)
+				pThrds[pIdx].join();
+
+
+		/*	std::cout << IoStream::lock;
+			std::cout << recv_ciphertexts[0][0] << " - r ciphertexts[0][0]  - " << myIdx << std::endl;
+			std::cout << recv_ciphertexts[1][0] << " - r ciphertexts[1][0]  - " << myIdx << std::endl;
+			std::cout << IoStream::unlock;*/
+
+			std::unordered_map<u64, std::pair<block, u32>> localMasks;
+			for (u32 i = 0; i < setSize; i++) //create an unordered_map for recv_ciphertexts[0]
+			{
+				localMasks.emplace(*(u64*)&recv_ciphertexts[0][i], std::pair<block, u32>(recv_ciphertexts[0][i], i));
+			}
+
+
+			
+			for (int i = 0; i < setSize; i++) //for each item in recv_ciphertexts[1], we check it in localMasks
+			{
+				u64 shortcut;
+				memcpy((u8*)&shortcut, (u8*)&recv_ciphertexts[1][i], sizeof(u64));
+				auto match = localMasks.find(shortcut);
+
+				//if match, check for whole bits
+				if (match != localMasks.end())
+				{
+					if (memcmp((u8*)&recv_ciphertexts[1][i], &match->second.first, sizeof(block)) == 0) // check full mask
+					{
+						mIntersection.push_back(match->second.second);
+					}
+				}
+			}
+			Log::out << "mIntersection.size(): " << mIntersection.size() << Log::endl;
+		}
+
+		//if (myIdx == thirdpartyIdx)
+		//{	
+		//	u32 intersectionSize= mIntersection.size();
+
+		//	//ignore this for now
+		//	chls[party_n][0]->send(&intersectionSize, sizeof(u32));
+		//	chls[party_n][0]->send(mIntersection.data(), mIntersection.size() * sizeof(u32)); // send index of the intersection
+		//}
+		//else if (myIdx == party_n)
+		//{
+		//	u32 intersectionSize;
+		//	chls[0][0]->recv(&intersectionSize, sizeof(u32));
+
+		//	//Log::out << "mIntersection.size(): " << intersectionSize << Log::endl;
+		//	
+		//	mIntersection.resize(intersectionSize);
+		//	chls[0][0]->recv(mIntersection.data(), intersectionSize * sizeof(u32)); // receive pi(F_ki(xi)) from party 1
+
+		//}
+	}
+#if 0
+
+
 	if (myIdx == party_n1 || myIdx == party_n) //for 2psi
 	{
 		std::vector<KkrtNcoOtReceiver> otRecv(2);
@@ -464,6 +599,9 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 			}*/
 		}
 	}
+
+
+#endif
 
 	auto timmer_end = timer.setTimePoint("end");
 	if (myIdx == party_n)
