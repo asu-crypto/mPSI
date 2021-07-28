@@ -48,7 +48,11 @@ link_directories("${Miracl_Dirs}/miracl/source/")
 # default location for NTL
 set(NTL_Dirs "${CMAKE_SOURCE_DIR}/thirdparty/linux/ntl/")
 include_directories("${NTL_Dirs}/include/")
-link_directories("${NTL_Dirs}/src/") 
+link_directories("${NTL_Dirs}/src/")
+
+set(libPaXoS_Dirs "${CMAKE_SOURCE_DIR}/libPaXoS/")
+include_directories("${libPaXoS_Dirs}/libPaXoS/")
+link_directories("${libPaXoS_Dirs}/lib/")
 
 # default location for Boost
 set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/thirdparty/linux/boost/")
@@ -72,6 +76,12 @@ include_directories(libOTe)
 #############################################
 add_subdirectory(libOPRF)
 include_directories(libOPRF)
+
+#############################################
+#               Build libPaXoS              #
+#############################################
+add_subdirectory(libPaXoS)
+include_directories(libPaXoS)
 
 
 #############################################
