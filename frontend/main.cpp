@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	//return 0;
 	//InitDebugPrinting();
 //	GbfTest();
-//	return 0; 
+//	return 0;
 	//PolyTest();
 	//party_test(PolyOkvs);
 	//party2psi_Test_Main();
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 	return 0;*/
 	//============
 	/*O1nPSI_Test();
-	
+
 	nPSI2_server_aided_Test();*/
 	/*tPSI_Test();
 
@@ -179,9 +179,9 @@ int main(int argc, char** argv)
 		}
 
 		break;
-		
 
-	case 9: //tPSI 
+
+	case 9: //tPSI
 		//cout << "9\n";
 
 		if (argv[1][0] == '-' && argv[1][1] == 'm')
@@ -211,8 +211,8 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
-		if (argv[7][0] == '-' && argv[7][1] == 'p') 
-		{	
+		if (argv[7][0] == '-' && argv[7][1] == 'p')
+		{
 			u64 pIdx = atoi(argv[8]);
 			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
 			tpsi_party(pIdx, nParties, tParties, setSize, GbfOkvs, secSemiHonest);

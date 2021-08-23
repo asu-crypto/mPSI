@@ -7,13 +7,13 @@
 
 #include <cstdlib>
 #include <cinttypes>
-#include "xxhash.h"
+#include "xxHash/xxhash.h"
 
 using namespace std;
 class Hasher {
 private:
 
-    unsigned long long s-llibPaXoSeed;
+    unsigned long long seed;
 
 public:
 

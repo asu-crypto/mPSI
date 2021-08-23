@@ -13,7 +13,7 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/lib)
 #############################################
 add_definitions(-DSOLUTION_DIR=\"${CMAKE_SOURCE_DIR}\")
 set(CMAKE_C_FLAGS "-ffunction-sections -Wall  -maes -msse2 -msse4.1 -mpclmul -Wfatal-errors -pthread")
-set(CMAKE_CXX_FLAGS  "${CMAKE_C_FLAGS}  -std=c++14")
+set(CMAKE_CXX_FLAGS  "${CMAKE_C_FLAGS}  -std=gnu++14")
 
 # Set a default build type for single-configuration
 # CMake generators if no build type is set.
@@ -52,7 +52,7 @@ link_directories("${NTL_Dirs}/src/")
 
 set(libPaXoS_Dirs "${CMAKE_SOURCE_DIR}/libPaXoS/")
 include_directories("${libPaXoS_Dirs}/libPaXoS/")
-link_directories("${libPaXoS_Dirs}/lib/")
+link_directories("${libPaXoS_Dirs}/")
 
 # default location for Boost
 set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/thirdparty/linux/boost/")
