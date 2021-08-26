@@ -8,7 +8,7 @@
 #               Build fronend.exe           #
 #############################################
 
-file(GLOB_RECURSE SRC_FRONTEND ${CMAKE_SOURCE_DIR}/frontend/*.cpp)
+file(GLOB SRC_FRONTEND ${CMAKE_SOURCE_DIR}/frontend/*.cpp)
 include_directories(${CMAKE_SOURCE_DIR}/frontend/)
 
 add_executable(frontend.exe ${SRC_FRONTEND})

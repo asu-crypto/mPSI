@@ -1,22 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
-project(OBDBasedPSI)
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -msse4.2 -fPIE")
+set(SOURCE_FILES ObliviousDictionary.cpp gf2e_mat_solve.cpp)
 
+add_library(libPaXoS ${SOURCE_FILES})
 
-file(GLOB SRCS *.cpp)
-#include_directories(${CMAKE_SOURCE_DIR}/libPaXoS)
-
-add_library(libPaXoS ${SRCS})
-
-#target_link_libraries(libOPRF libOTe cryptoTools  ${NTL_LIB})
-
-#set(SOURCE_FILES main.cpp ObliviousDictionary.cpp ProtocolParty.cpp gf2e_mat_solve.cpp)
-
-
-#add_executable(OBDBasedPSI ${SOURCE_FILES})
-
-#NTL stuff
+#NTL
 set(NTL_Lib_Dirs "${NTL_Dirs}/src/")
 set(NTL_Include_Dirs "${NTL_Dirs}/include/")
 set(NTL_LIB "${NTL_Lib_Dirs}libntl.a")
