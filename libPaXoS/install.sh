@@ -23,6 +23,13 @@ else
   exit 1
 fi
 
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-echo -e "${RED}**Using ubuntu 18? You might have a problem building linbox! Check the readme file in libPaXoS for more information!**${NC}"
+cd /usr/include/linbox/matrix/densematrix/
+LINE_OUTPUT=$(sed '70q;d' blas-transposed-matrix.h)
+
+if [ "$LINE_OUTPUT" = "#if !defined(__INTEL_COMPILER) && !defined(__CUDACC__) & !defined(__clang__)$" ]; then
+  echo "Older version of linbox detected. Patching it according to https://github.com/linbox-team/linbox/issues/116"
+  sudo sed -i '70d' blas-transposed-matrix.h
+  sudo sed -i '70d' blas-transposed-matrix.h
+  sudo sed -i '70d' blas-transposed-matrix.h
+  echo "Done patching the file. Linbox should be good to go now!"
+fi
