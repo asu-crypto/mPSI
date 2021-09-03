@@ -2,6 +2,8 @@
 
 echo "About to install dependencies"
 
+sudo apt install gcc clang pentium-builder tcc
+
 sudo apt install libntl-dev liblinbox-dev libgmp-dev libboost-system-dev libssl-dev libiml-dev
 
 RESULT=$?
