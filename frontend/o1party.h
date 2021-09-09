@@ -6,6 +6,7 @@
 #include <set>
 #include "gbf.h"
 #include <Common/ByteStream.h>
+#include "ObliviousDictionary.h"
 
 using namespace osuCrypto;
 
@@ -44,6 +45,8 @@ inline void party1_encode(std::vector<block> inputSet, const std::vector<block> 
 		GbfEncode(inputSet, setValues, okvsTable);
 	else if (type_okvs == PolyOkvs)
 		PolyEncode(inputSet, setValues, okvsTable);
+	else if (type_okvs == PaxosOkvs)
+	    PaxosEncode(inputSet, setValues, okvsTable);
 
 	/*std::cout << IoStream::lock;
 	for (u64 i = 0; i < 2; i++)
@@ -82,6 +85,8 @@ inline void party2_encode(const std::vector<block> inputSet, const block& aesKey
 		GbfEncode(inputSet, setValues, okvsTable);
 	else if (type_okvs == PolyOkvs)
 		PolyEncode(inputSet, setValues, okvsTable);
+    else if (type_okvs == PaxosOkvs)
+        PaxosEncode(inputSet, setValues, okvsTable);
 
 	//if (type_okvs == PolyOkvs) //TODO
 }
@@ -108,6 +113,8 @@ inline void partyn1_decode(const std::vector<block> inputSet, const block& aesKe
 			GbfDecode(okvsTables[idxParty], inputSet, setValues); // setValues[idxItem]=Decode(okvsTables[idxParty], x)
 		else if (type_okvs == PolyOkvs)
 			PolyDecode(okvsTables[idxParty], inputSet, setValues); // setValues[idxItem]=Decode(okvsTables[idxParty], x)
+		else if (type_okvs == PaxosOkvs)
+            PaxosDecode(okvsTables[idxParty], inputSet, setValues);
 
 
 		for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem) //compute xor all decode() 
@@ -140,6 +147,8 @@ inline void partyn_decode(const std::vector<block> inputSet, const std::vector<b
 		GbfDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
 	else if (type_okvs == PolyOkvs)
 		PolyDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
+	else if (type_okvs == PaxosOkvs)
+	    PaxosDecode(okvsTable, inputSet, inputSet2PSI);
 
 
 	/*std::cout << IoStream::lock;
@@ -222,7 +231,8 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
 		okvsTableSize = okvsLengthScale * setSize;
 	else if (type_okvs == PolyOkvs)
 		okvsTableSize = setSize;
-
+	else if (type_okvs == PaxosOkvs)
+        okvsTableSize = setSize;
 
 	std::string name("psi");
 	BtIOService ios(0);

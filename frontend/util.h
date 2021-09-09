@@ -7,6 +7,7 @@
 
 #define GbfOkvs 0
 #define PolyOkvs 1
+#define PaxosOkvs 2
 #define	TableOPPRF 0
 
 #define secMalicious 0

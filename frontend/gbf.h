@@ -9,6 +9,7 @@
 #include <NTL/vec_ZZ_p.h>
 #include <NTL/ZZ_pX.h>
 #include <NTL/ZZ.h>
+#include <ObliviousDictionary.h>
 
 using namespace osuCrypto;
 
@@ -183,6 +184,37 @@ inline void GbfTest()
 
 	}
 	std::cout << " ============== done ==============\n";
+
+}
+
+
+inline  void PaxosEncode(const std::vector<block> setKeys, const std::vector<block> setValues, std::vector<block>& garbledBF)
+{
+
+    int hashSize=setKeys.size(), fieldSize=65, gamma = 60, v=20;
+    double c1 = 2.4;
+    vector<uint64_t> keys;
+    vector<unsigned char> values;
+    keys.resize(hashSize);
+    int fieldSizeBytes = fieldSize % 8 == 0 ? fieldSize/8 : fieldSize/8 + 1;
+    int zeroBits = 8 - fieldSize % 8;
+    values.resize(hashSize*fieldSizeBytes);
+    for (int j=0; j < hashSize*fieldSizeBytes; j++){
+        char x = 'a';
+        values[j] = x+j;//prg.getRandom64();
+    }
+    for (int i=0; i<hashSize; i++){
+        values[(i+1)*fieldSizeBytes-1] = values[(i+1)*fieldSizeBytes-1]  >> zeroBits;
+    }
+
+    ObliviousDictionary* dic = new OBD3Tables(hashSize, c1, fieldSize, gamma, v);
+    dic->init();
+    dic->setKeysAndVals(setKeys, setValues);
+    dic->encode();
+}
+
+inline  void PaxosDecode(const std::vector<block> paxosMat, const std::vector<block> setKeys, std::vector<block>& setValues)
+{
 
 }
 
