@@ -15,7 +15,7 @@ else
 fi
 
 echo "About to make xxhash"
-cd xxhash
+cd xxHash
 make
 RESULT=$?
 if [ $RESULT -eq 0 ]; then
