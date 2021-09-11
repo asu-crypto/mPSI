@@ -25,15 +25,15 @@ else()
 	#message(" ----  NTL -----  ${NTL_Include_Dirs}")
 endif()
 
-include_directories(./xxHash)
 
-target_link_directories(libPaXoS
-	PUBLIC	./xxHash
-)
+find_library(
+		xxHash_LIB
+		NAMES xxhash
+		HINTS ./xxHash)
 
 target_link_libraries(libPaXoS
 		${NTL_LIB}
-		xxhash
+		${xxHash_LIB}
 		linbox
 		iml
         boost_system
