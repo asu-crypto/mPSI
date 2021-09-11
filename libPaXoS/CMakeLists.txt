@@ -27,7 +27,7 @@ endif()
 
 include_directories(./xxHash)
 
-target_link_directories(libPaXoS
+target_link_libraries(libPaXoS
 	PUBLIC	./xxHash
 )
 
