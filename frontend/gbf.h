@@ -10,6 +10,7 @@
 #include <NTL/ZZ_pX.h>
 #include <NTL/ZZ.h>
 #include <ObliviousDictionary.h>
+#include "xxHash/xxhash.h"
 
 using namespace osuCrypto;
 
@@ -209,8 +210,22 @@ inline  void PaxosEncode(const std::vector<block> setKeys, const std::vector<blo
 
     ObliviousDictionary* dic = new OBD3Tables(hashSize, c1, fieldSize, gamma, v);
     dic->init();
-    dic->setKeysAndVals(setKeys, setValues);
+    for (int i=0; i < setKeys.size(); i++){
+        keys[i] = XXH64(&setKeys[i], 64, 0);
+    }
+    for (int i=0; i < setValues.size(); i++){
+        values[i] = XXH64(&setValues[i], 64, 0);
+    }
+    cout << keys[0]<<endl;
+    cout << values[0]<<endl;
+    cout << setKeys[0]<<endl;
+    cout << setValues[0]<<endl;
+
+    dic->setKeysAndVals(keys, values);
     dic->encode();
+    auto x = dic->getVariables();
+//    garbledBF = &x;
+
 }
 
 inline  void PaxosDecode(const std::vector<block> paxosMat, const std::vector<block> setKeys, std::vector<block>& setValues)

@@ -45,6 +45,8 @@ inline void user_encode(std::vector<block> inputSet, const std::vector<block> ae
 		GbfEncode(inputSet, setValues, okvsTable);
 	else if (type_okvs == PolyOkvs)
 		PolyEncode(inputSet, setValues, okvsTable);
+    else if (type_okvs == PaxosOkvs)
+        PaxosEncode(inputSet, setValues, okvsTable);
 
 	/*std::cout << IoStream::lock;
 	for (u64 i = 0; i < 2; i++)
@@ -81,6 +83,8 @@ inline void partyt_decode(const std::vector<block> inputSet, const std::vector <
 			GbfDecode(okvsTables[idxParty], hashInputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
 		else if (type_okvs == PolyOkvs)
 			PolyDecode(okvsTables[idxParty], hashInputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
+        else if (type_okvs == PaxosOkvs)
+            PaxosDecode(okvsTables[idxParty], hashInputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
 	
 		for (u64 idxItem = 0; idxItem < inputSet.size(); ++idxItem)
 			inputSet2ZeroXOR[idxItem] = decodeValues[idxItem] ^ inputSet2ZeroXOR[idxItem];  //xor all values 
@@ -106,7 +110,8 @@ inline void partyt_decode(std::vector<block> inputSet, const std::vector<block> 
 			GbfDecode(okvsTable, inputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
 		else if (type_okvs == PolyOkvs)
 			PolyDecode(okvsTable, inputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
-
+        else if (type_okvs == PaxosOkvs)
+            PaxosDecode(okvsTable, inputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
 		
 	}
 
@@ -563,6 +568,8 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 		okvsTableSize = okvsLengthScale * setSize;
 	else if (type_okvs == PolyOkvs)
 		okvsTableSize = setSize;
+    else if (type_okvs == PaxosOkvs)
+        okvsTableSize = setSize;
 
 
 	std::string name("psi");
