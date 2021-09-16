@@ -17,7 +17,9 @@ else
   exit 1
 fi
 
-cd linux
+cd libPaXoS
+bash install.sh
+cd ../../thirdparty/linux
 
 bash boost.get &
 bash miracl.get &
