@@ -10,8 +10,8 @@ git clone --recursive git@github.com:asu-crypto/mPSI.git
 ```
 
 ### Quick Installation (Linux)
-    $ cd mPSI
-    $ bash buildAll.get
+    $ cd mPSI/thirdparty
+    $ bash all_linux.get
 
 
 
