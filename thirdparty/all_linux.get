@@ -17,7 +17,7 @@ else
   exit 1
 fi
 
-cd libPaXoS
+cd ../libPaXoS
 bash install.sh
 cd ../../thirdparty/linux
 
