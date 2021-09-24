@@ -46,7 +46,7 @@ inline void user_encode(std::vector<block> inputSet, const std::vector<block> ae
 	else if (type_okvs == PolyOkvs)
 		PolyEncode(inputSet, setValues, okvsTable);
     else if (type_okvs == PaxosOkvs)
-        PaxosEncode(inputSet, setValues, okvsTable);
+        PaxosEncode(inputSet, setValues, okvsTable, 128);
 
 	/*std::cout << IoStream::lock;
 	for (u64 i = 0; i < 2; i++)

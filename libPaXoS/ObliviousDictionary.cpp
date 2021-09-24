@@ -134,18 +134,18 @@ vector<uint64_t> OBD2Tables::dec(uint64_t key){
 //    auto keyIndices = indices[key];
 //    if(keyIndices.size() == 0) {
 //        cout<<"first time"<<endl;
-vector<uint64_t> keyIndices;
-        keyIndices.push_back(first.bucket(key));
-        keyIndices.push_back(tableRealSize + second.bucket(key));
+    vector<uint64_t> keyIndices;
+    keyIndices.push_back(first.bucket(key));
+    keyIndices.push_back(tableRealSize + second.bucket(key));
 
-        auto dhBits = getDHBits(key);
-        uint64_t mask = 1;
-        for (int j = 0; j < gamma; j++) {
-            if ((dhBits & mask) == 1) {
-                keyIndices.push_back(2 * tableRealSize + j); //put 1 in the right vertex of the edge
-            }
-            dhBits = dhBits >> 1;
+    auto dhBits = getDHBits(key);
+    uint64_t mask = 1;
+    for (int j = 0; j < gamma; j++) {
+        if ((dhBits & mask) == 1) {
+            keyIndices.push_back(2 * tableRealSize + j); //put 1 in the right vertex of the edge
         }
+        dhBits = dhBits >> 1;
+    }
 //        indices[key] = move(keyIndices);
 
 //    }
@@ -157,15 +157,15 @@ vector<uint64_t> OBD2Tables::decOptimized(uint64_t key){
 //    auto keyIndices = indices[key];
 //    if(keyIndices.size() == 0) {
 //        cout<<"first time"<<endl;
-vector<uint64_t> keyIndices(10);
-        keyIndices[0] = first.bucket(key);
-        keyIndices[1] = tableRealSize + second.bucket(key);
+    vector<uint64_t> keyIndices(10);
+    keyIndices[0] = first.bucket(key);
+    keyIndices[1] = tableRealSize + second.bucket(key);
 
-        auto dhBits = getDHBits(key);
-        byte* dhBytes = (byte*) (&dhBits);
-        for (int j = 0; j < 8; j++) {
-            keyIndices[2 + j] = dhBytes[j]; //put 1 in the right vertex of the edge
-        }
+    auto dhBits = getDHBits(key);
+    byte* dhBytes = (byte*) (&dhBits);
+    for (int j = 0; j < 8; j++) {
+        keyIndices[2 + j] = dhBytes[j]; //put 1 in the right vertex of the edge
+    }
 //        indices[key] = move(keyIndices);
 
 //    }
@@ -486,8 +486,10 @@ void OBD2Tables::unpeeling(){
 //        poliVal = polyVals[peelingCounter];
         if (variables[indices[0]] == 0 && variables[indices[1]] == 0 && sign[indices[0]] == 0 && sign[indices[1]] == 0){
 //            randomVal = prg.getPRGBytesEX(fieldSizeBytes);
-            randomVal = nullptr;
-            GF2XFromBytes(temp, randomVal ,fieldSizeBytes);
+//            randomVal = 0;
+            vector<byte> r;
+            r.resize(fieldSizeBytes);
+            GF2XFromBytes(temp, (unsigned char *)&r ,fieldSizeBytes);
             variables[indices[0]] = to_GF2E(temp);
 //                cout<<"set RANDOM value "<<variables[indices[0]]<<" in index "<<indices[0]<<endl;
         }
@@ -630,18 +632,18 @@ vector<uint64_t> OBD3Tables::dec(uint64_t key){
 //    auto keyIndices = indices[key];
 //    if(keyIndices.size() == 0) {
     vector<uint64_t> keyIndices;
-        keyIndices.push_back(first.bucket(key));
-        keyIndices.push_back(tableRealSize + second.bucket(key));
-        keyIndices.push_back(2 * tableRealSize + third.bucket(key));
+    keyIndices.push_back(first.bucket(key));
+    keyIndices.push_back(tableRealSize + second.bucket(key));
+    keyIndices.push_back(2 * tableRealSize + third.bucket(key));
 
-        auto dhBits = getDHBits(key);
-        uint64_t mask = 1;
-        for (int j = 0; j < gamma; j++) {
-            if ((dhBits & mask) == 1) {
-                keyIndices.push_back(3 * tableRealSize + j); //put 1 in the right vertex of the edge
-            }
-            dhBits = dhBits >> 1;
+    auto dhBits = getDHBits(key);
+    uint64_t mask = 1;
+    for (int j = 0; j < gamma; j++) {
+        if ((dhBits & mask) == 1) {
+            keyIndices.push_back(3 * tableRealSize + j); //put 1 in the right vertex of the edge
         }
+        dhBits = dhBits >> 1;
+    }
 //        indices[key] = move(keyIndices);
 //    }
 
@@ -829,7 +831,7 @@ int OBD3Tables::peeling() {
 //      cout << "time in milliseconds for peel queues: " << duration << endl;
 
     if (peelingCounter != hashSize) {
-    cout << "2 core contain : " << hashSize - peelingCounter << endl;
+        cout << "2 core contain : " << hashSize - peelingCounter << endl;
     }
 //        cout << "hashSize : " << hashSize << endl;
 
@@ -847,8 +849,8 @@ int OBD3Tables::peeling() {
 }
 
 void OBD3Tables::handleQueue(queue<int> &queueMain, unordered_set<uint64_t, Hasher> &main,
-                                               queue<int> &queueOther1, unordered_set<uint64_t, Hasher> &other1,
-                                               queue<int> &queueOther2,unordered_set<uint64_t, Hasher> &other2) {
+                             queue<int> &queueOther1, unordered_set<uint64_t, Hasher> &other1,
+                             queue<int> &queueOther2,unordered_set<uint64_t, Hasher> &other2) {
 
     int bucketInd;
     for(int i=0; i < queueMain.size(); i++){
@@ -1042,6 +1044,7 @@ void OBD3Tables::unpeeling(){
     byte* randomVal;
     GF2E dhBitsVal;
     GF2X temp;
+    osuCrypto::PRNG prng(_mm_set_epi32(4253465, 3434565, 234435, 23987045));
 
     while (peelingCounter > 0){
 //            cout<<"key = "<<key<<endl;
@@ -1062,15 +1065,18 @@ void OBD3Tables::unpeeling(){
 
             if (variables[indices[1]] == 0 && sign[indices[1]] == 0){
 //                randomVal = prg.getPRGBytesEX(fieldSizeBytes);
-                randomVal = 0;
-                GF2XFromBytes(temp, randomVal ,fieldSizeBytes);
+                vector<byte> r;
+                r.resize(fieldSizeBytes);
+                GF2XFromBytes(temp, (unsigned char *)&r ,fieldSizeBytes);
                 variables[indices[1]] = to_GF2E(temp);
             }
 
             if (variables[indices[2]] == 0 && sign[indices[2]] == 0) {
 //                randomVal = prg.getPRGBytesEX(fieldSizeBytes);
-                randomVal = 0;
-                GF2XFromBytes(temp, randomVal, fieldSizeBytes);
+//                randomVal = 0;
+                vector<byte> r;
+                r.resize(fieldSizeBytes);
+                GF2XFromBytes(temp, (unsigned char *)&r, fieldSizeBytes);
                 variables[indices[2]] = to_GF2E(temp);
             }
 
@@ -1081,8 +1087,9 @@ void OBD3Tables::unpeeling(){
 
             if (variables[indices[2]] == 0 && sign[indices[2]] == 0) {
 //                randomVal = prg.getPRGBytesEX(fieldSizeBytes);
-                randomVal = 0;
-                GF2XFromBytes(temp, randomVal, fieldSizeBytes);
+                vector<byte> r;
+                r.resize(fieldSizeBytes);
+                GF2XFromBytes(temp, (unsigned char *)&r, fieldSizeBytes);
                 variables[indices[2]] = to_GF2E(temp);
             }
 
@@ -1220,31 +1227,31 @@ vector<uint64_t> StarDictionary::dec(uint64_t key){
 
 //    auto keyIndices = indices[key];
 //    if (keyIndices.size() == 0) {
-        int binIndex = hashForBins(key) % q;
-        int innerIndicesSize = bins[0]->getTableSize();
-        //    cout<<"bins[0]->getTableSize() = "<<bins[0]->getTableSize()<<endl;
-        //    cout<<"gamma = "<<gamma<<endl;
-        //    cout<<"innerSize in dec = "<<innerIndicesSize<<endl;
-        auto binIndices = bins[binIndex]->dec(key);
+    int binIndex = hashForBins(key) % q;
+    int innerIndicesSize = bins[0]->getTableSize();
+    //    cout<<"bins[0]->getTableSize() = "<<bins[0]->getTableSize()<<endl;
+    //    cout<<"gamma = "<<gamma<<endl;
+    //    cout<<"innerSize in dec = "<<innerIndicesSize<<endl;
+    auto binIndices = bins[binIndex]->dec(key);
 
-        //    cout<<"binIndex =  "<<binIndex<<" numItemsForBin = "<<numItemsForBin<<endl;
+    //    cout<<"binIndex =  "<<binIndex<<" numItemsForBin = "<<numItemsForBin<<endl;
 
 
-        auto centerIndices = bins[center]->dec(key);
+    auto centerIndices = bins[center]->dec(key);
 
-        vector<uint64_t> keyIndices(binIndices.size() + centerIndices.size()); //Will hold the indices of the big array
+    vector<uint64_t> keyIndices(binIndices.size() + centerIndices.size()); //Will hold the indices of the big array
 
-        int startIndex = binIndex * innerIndicesSize;
-        for (int i = 0; i < binIndices.size(); i++) {
-            keyIndices[i] = startIndex + binIndices[i];
+    int startIndex = binIndex * innerIndicesSize;
+    for (int i = 0; i < binIndices.size(); i++) {
+        keyIndices[i] = startIndex + binIndices[i];
 
-        }
+    }
 
-        startIndex = center * innerIndicesSize;
-        for (int i = 0; i < centerIndices.size(); i++) {
-            keyIndices[binIndices.size() + i] = startIndex + centerIndices[i];
+    startIndex = center * innerIndicesSize;
+    for (int i = 0; i < centerIndices.size(); i++) {
+        keyIndices[binIndices.size() + i] = startIndex + centerIndices[i];
 
-        }
+    }
 
 //        indices[key] = move(keyIndices);
 //    }
@@ -1534,12 +1541,12 @@ bool StarDictionary::checkOutput(uint64_t key, int valIndex){
     auto indices = bins[index] -> dec(key);
 
     int size = bins[0]->getTableSize();
-   for (int i=0; i<indices.size(); i++){
-       for (int j=0; j<fieldSizeBytes; j++){
-           temp1[j] ^= bins[index]->getVariables()[indices[i]*fieldSizeBytes + j];
-       }
+    for (int i=0; i<indices.size(); i++){
+        for (int j=0; j<fieldSizeBytes; j++){
+            temp1[j] ^= bins[index]->getVariables()[indices[i]*fieldSizeBytes + j];
+        }
 
-   }
+    }
 
     auto rightVal = bins[index] -> decode(key);
     for (int j=0; j<fieldSizeBytes; j++) {
@@ -1561,7 +1568,7 @@ bool StarDictionary::checkOutput(uint64_t key, int valIndex){
         }
 
     }
-     rightVal = bins[center] -> decode(key);
+    rightVal = bins[center] -> decode(key);
     for (int j=0; j<fieldSizeBytes; j++) {
         if (temp2[j] == rightVal[j]) {
 //            if (i%100000 == 0)
@@ -1573,15 +1580,15 @@ bool StarDictionary::checkOutput(uint64_t key, int valIndex){
 
 //        GF2XFromBytes(temp, decValBytes.data(), fieldSizeBytes);
 //        decVal = to_GF2E(temp);
-        for (int j=0; j<fieldSizeBytes; j++) {
-            if (temp1[j]^temp2[j] == values[valIndex * fieldSizeBytes + j]) {
+    for (int j=0; j<fieldSizeBytes; j++) {
+        if (temp1[j]^temp2[j] == values[valIndex * fieldSizeBytes + j]) {
 //            if (i%100000 == 0)
 //                cout<<"good value!!! val = "<<val<<endl;
-            } else {//if (!hasLoop()){
-                error = true;
-                cout << "invalid value :( "<< endl;
-            }
+        } else {//if (!hasLoop()){
+            error = true;
+            cout << "invalid value :( "<< endl;
         }
+    }
 
 
     if (!error){

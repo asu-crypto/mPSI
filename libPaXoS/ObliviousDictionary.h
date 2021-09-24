@@ -15,7 +15,7 @@
 #include <NTL/GF2X.h>
 #include <NTL/GF2XFactoring.h>
 #include "gf2e_mat_solve.h"
-//#include "thirdparty/linux/ntl/include/NTL/GF2E.h"
+#include "Crypto/PRNG.h"
 
 #include <chrono>
 #include <queue>
@@ -59,6 +59,7 @@ public:
              statisticsFile.close();
          }
     }
+
 
     virtual void setKeysAndVals(vector<uint64_t>& keys, vector<byte>& values){
 
@@ -107,8 +108,8 @@ public:
     virtual bool encode() = 0;
 
     void generateRandomEncoding() {
-cout<<"variables.size() = "<<variables.size()<<endl;
-cout<<"fieldSizeBytes = "<<fieldSizeBytes<<endl;
+        cout<<"variables.size() = "<<variables.size()<<endl;
+        cout<<"fieldSizeBytes = "<<fieldSizeBytes<<endl;
 
         sigma.resize(variables.size()*fieldSizeBytes);
 //        sigma.insert(0);
