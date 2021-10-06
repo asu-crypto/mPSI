@@ -130,7 +130,8 @@ int main(int argc, char** argv)
 		{
 			u64 pIdx = atoi(argv[4]);
 			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
-			party_psi3(pIdx, setSize, PaxosOkvs, secSemiHonest);
+			//party_psi3(pIdx, setSize, PaxosOkvs, secSemiHonest);
+			party_psi3(pIdx, setSize, SimulatedOkvs, secSemiHonest);
 			//party_psi2_server_aided(pIdx, setSize,secSemiHonest);
 		}
 		else
@@ -168,8 +169,8 @@ int main(int argc, char** argv)
 			if (pIdx == 0)
 				cout << "partyO1 protocol\n";
 
-			partyO1(pIdx, nParties, setSize, PaxosOkvs, secSemiHonest);
-			//aug_party(pIdx, nParties, setSize, 0, 1);
+			//partyO1(pIdx, nParties, setSize, PaxosOkvs, secSemiHonest);
+			partyO1(pIdx, nParties, setSize, SimulatedOkvs, secSemiHonest);
 		}
 		else
 		{
@@ -215,7 +216,8 @@ int main(int argc, char** argv)
 		{
 			u64 pIdx = atoi(argv[8]);
 			//cout << setSize << " \t"  << nParties << " \t" << tParties << "\t" << pIdx << "\n";
-			tpsi_party(pIdx, nParties, tParties, setSize, PaxosOkvs, secSemiHonest);
+			//tpsi_party(pIdx, nParties, tParties, setSize, PaxosOkvs, secSemiHonest);
+			tpsi_party(pIdx, nParties, tParties, setSize, SimulatedOkvs, secSemiHonest);
 		}
 		else
 		{

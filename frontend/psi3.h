@@ -30,7 +30,7 @@ inline void party_psi3(u64 myIdx, u64 setSize, u64 type_okvs, u64 type_security)
 		u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
 
 
-		if (type_okvs == GbfOkvs)
+		if (type_okvs == SimulatedOkvs)
 			okvsTableSize = okvsLengthScale * setSize;
 		else if (type_okvs == PolyOkvs)
 			okvsTableSize = setSize;

@@ -41,8 +41,8 @@ inline void user_encode(std::vector<block> inputSet, const std::vector<block> ae
 	//	std::cout << setValues[i] << " - encode party 1 - " << i << std::endl;
 	//std::cout << IoStream::unlock;
 
-	if (type_okvs == GbfOkvs)
-		GbfEncode(inputSet, setValues, okvsTable);
+	if (type_okvs == SimulatedOkvs)
+		SimulatedOkvsEncode(inputSet, setValues, okvsTable);
 	else if (type_okvs == PolyOkvs)
 		PolyEncode(inputSet, setValues, okvsTable);
     else if (type_okvs == PaxosOkvs)
@@ -57,7 +57,7 @@ inline void user_encode(std::vector<block> inputSet, const std::vector<block> ae
 
 	//if (type_okvs == PolyOkvs) //TODO
 	//std::vector<block> inputSet2PSI(inputSet.size(), ZeroBlock);
-	//GbfDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
+	//SimulatedOkvsDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
 	//std::cout << IoStream::lock;
 	//for (u64 i = 0; i < 2; i++)
 	//{
@@ -79,8 +79,8 @@ inline void partyt_decode(const std::vector<block> inputSet, const std::vector <
 	
 	for (u64 idxParty = 0; idxParty < okvsTables.size(); idxParty++)
 	{
-		if (type_okvs == GbfOkvs)
-			GbfDecode(okvsTables[idxParty], hashInputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
+		if (type_okvs == SimulatedOkvs)
+			SimulatedOkvsDecode(okvsTables[idxParty], hashInputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
 		else if (type_okvs == PolyOkvs)
 			PolyDecode(okvsTables[idxParty], hashInputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
         else if (type_okvs == PaxosOkvs)
@@ -106,8 +106,8 @@ inline void partyt_decode(std::vector<block> inputSet, const std::vector<block> 
 	
 	//for (u64 idxParty = 0; idxParty < okvsTables.size(); idxParty++)
 	{
-		if (type_okvs == GbfOkvs)
-			GbfDecode(okvsTable, inputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
+		if (type_okvs == SimulatedOkvs)
+			SimulatedOkvsDecode(okvsTable, inputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
 		else if (type_okvs == PolyOkvs)
 			PolyDecode(okvsTable, inputSet, decodeValues); //Decode(okvsTable, x) where okvsTable is received from idxParty [0->t-1]
         else if (type_okvs == PaxosOkvs)
@@ -564,7 +564,7 @@ inline void tpsi_party( u64 myIdx, u64 nParties, u64 threshold, u64 setSize, u64
 	u64 expected_intersection = 3;// (*(u64*)&prng.get<block>()) % setSize;
 
 
-	if (type_okvs == GbfOkvs)
+	if (type_okvs == SimulatedOkvs)
 		okvsTableSize = okvsLengthScale * setSize;
 	else if (type_okvs == PolyOkvs)
 		okvsTableSize = setSize;
@@ -923,8 +923,8 @@ inline void tpsi_zeroXOR_test(u64 type_okvs, u64 type_security)
 	{
 		pThrds[pIdx] = std::thread([&, pIdx]() {
 			//Channel_party_test(pIdx, nParties);
-			//partyO1(pIdx, nParties, setSize, GbfOkvs, secSemiHonest);
-		//	zeroXOR_party(pIdx, nParties, chls[pIdx], inputSets[pIdx], inputSetZeroXOR[pIdx], mIntersection, GbfOkvs, secSemiHonest);
+			//partyO1(pIdx, nParties, setSize, SimulatedOkvs, secSemiHonest);
+		//	zeroXOR_party(pIdx, nParties, chls[pIdx], inputSets[pIdx], inputSetZeroXOR[pIdx], mIntersection, SimulatedOkvs, secSemiHonest);
 			//partyO1(pIdx, nParties, setSize,PolyOkvs, secSemiHonest);
 			});
 	}

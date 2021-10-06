@@ -41,8 +41,8 @@ inline void party1_encode(std::vector<block> inputSet, const std::vector<block> 
     //	std::cout << setValues[i] << " - encode party 1 - " << i << std::endl;
     //std::cout << IoStream::unlock;
     std::cout << type_okvs << endl;
-    if (type_okvs == GbfOkvs)
-        GbfEncode(inputSet, setValues, okvsTable);
+    if (type_okvs == SimulatedOkvs)
+        SimulatedOkvsEncode(inputSet, setValues, okvsTable);
     else if (type_okvs == PolyOkvs)
         PolyEncode(inputSet, setValues, okvsTable);
     else if (type_okvs == PaxosOkvs)
@@ -57,7 +57,7 @@ inline void party1_encode(std::vector<block> inputSet, const std::vector<block> 
 
     //if (type_okvs == PolyOkvs) //TODO
     //std::vector<block> inputSet2PSI(inputSet.size(), ZeroBlock);
-    //GbfDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
+    //SimulatedOkvsDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
     //std::cout << IoStream::lock;
     //for (u64 i = 0; i < 2; i++)
     //{
@@ -81,8 +81,8 @@ inline void party2_encode(const std::vector<block> inputSet, const block& aesKey
     else
         aes.ecbEncBlocks(inputSet.data(), inputSet.size(), setValues.data()); //compute F_ki(xi)
 
-    if (type_okvs == GbfOkvs)
-        GbfEncode(inputSet, setValues, okvsTable);
+    if (type_okvs == SimulatedOkvs)
+        SimulatedOkvsEncode(inputSet, setValues, okvsTable);
     else if (type_okvs == PolyOkvs)
         PolyEncode(inputSet, setValues, okvsTable);
     else if (type_okvs == PaxosOkvs)
@@ -109,8 +109,8 @@ inline void partyn1_decode(const std::vector<block> inputSet, const block& aesKe
     for (u64 idxParty = 0; idxParty < okvsTables.size(); idxParty++) //okvsTables[idxParty]
     {
         std::vector<block> setValues(inputSet.size());
-        if (type_okvs == GbfOkvs)
-            GbfDecode(okvsTables[idxParty], inputSet, setValues); // setValues[idxItem]=Decode(okvsTables[idxParty], x)
+        if (type_okvs == SimulatedOkvs)
+            SimulatedOkvsDecode(okvsTables[idxParty], inputSet, setValues); // setValues[idxItem]=Decode(okvsTables[idxParty], x)
         else if (type_okvs == PolyOkvs)
             PolyDecode(okvsTables[idxParty], inputSet, setValues); // setValues[idxItem]=Decode(okvsTables[idxParty], x)
         else if (type_okvs == PaxosOkvs)
@@ -143,8 +143,8 @@ inline void partyn_decode(const std::vector<block> inputSet, const std::vector<b
     if (type_security == secMalicious)
         mAesFixedKey.ecbEncBlocks(inputSet.data(), inputSet.size(), hashInputSet.data()); //H(xi)
 
-    if (type_okvs == GbfOkvs)
-        GbfDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
+    if (type_okvs == SimulatedOkvs)
+        SimulatedOkvsDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
     else if (type_okvs == PolyOkvs)
         PolyDecode(okvsTable, inputSet, inputSet2PSI); //Decode(okvsTable, x) where okvsTable is received from party 1
     else if (type_okvs == PaxosOkvs)
@@ -227,7 +227,7 @@ inline void partyO1(u64 myIdx, u64 nParties, u64 setSize, u64 type_okvs, u64 typ
     u64 expected_intersection =3;// (*(u64*)&prng.get<block>()) % setSize;
 
 
-    if (type_okvs == GbfOkvs)
+    if (type_okvs == SimulatedOkvs)
         okvsTableSize = okvsLengthScale * setSize;
     else if (type_okvs == PolyOkvs)
         okvsTableSize = setSize;

@@ -11,6 +11,9 @@
 #include <NTL/ZZ.h>
 #include <ObliviousDictionary.h>
 #include "xxHash/xxhash.h"
+#include <iostream>
+#include <chrono>
+#include <thread>
 
 using namespace osuCrypto;
 
@@ -88,9 +91,11 @@ inline void GbfEncode(const std::vector<std::pair<block, block>> key_values, std
         if (eq(garbledBF[i], ZeroBlock))
             garbledBF[i] = prng.get<block>();
 
+    
+
     /*std::cout << IoStream::lock;
     for (u64 i = 0; i < 5; i++)
-        std::cout << coefficients[i] << " - GbfEncode - " << i << std::endl;
+        std::cout << coefficients[i] << " - SimulatedOkvsEncode - " << i << std::endl;
     std::cout << IoStream::unlock;*/
 }
 
@@ -106,6 +111,16 @@ inline  void GbfEncode(const std::vector<block> setKeys, const std::vector<block
     //std::cout << setValues[0] << " vs " << key_values[0].second << "\n";
 
     GbfEncode(key_values, garbledBF);
+
+    //simulat the cost of okvs
+    if (setKeys.size() <= (1 << 12)) //set size =2^12
+        this_thread::sleep_for(chrono::milliseconds(52));
+    else if (setKeys.size() <= (1 << 16)) //set size =2^16
+        this_thread::sleep_for(chrono::milliseconds(103));
+    else if (setKeys.size() <= (1 << 20)) //set size =2^16
+        this_thread::sleep_for(chrono::milliseconds(2838));
+    else
+        this_thread::sleep_for(chrono::milliseconds(2838*(setKeys.size()/(1<<20))));
 }
 
 inline  void GbfDecode(const std::vector<block> garbledBF, const std::vector<block> setKeys, std::vector<block>& setValues)
@@ -146,6 +161,15 @@ inline  void GbfDecode(const std::vector<block> garbledBF, const std::vector<blo
         //	std::cout << mSetY[0] << "\t vs \t" << sum << std::endl;
     }
 
+    //simulat the cost of okvs
+    if (setKeys.size() <= (1 << 12)) //set size =2^12
+        this_thread::sleep_for(chrono::milliseconds(3));
+    else if (setKeys.size() <= (1 << 16)) //set size =2^16
+        this_thread::sleep_for(chrono::milliseconds(5));
+    else if (setKeys.size() <= (1 << 20)) //set size =2^16
+        this_thread::sleep_for(chrono::milliseconds(990));
+    else
+        this_thread::sleep_for(chrono::milliseconds(990 * (setKeys.size() / (1 << 20))));
 }
 
 inline void GbfTest()
@@ -189,6 +213,38 @@ inline void GbfTest()
 }
 
 
+inline  void SimulatedOkvsEncode(const std::vector<block> setKeys, const std::vector<block> setValues, std::vector<block>& garbledBF)
+{
+     GbfEncode(setKeys, setValues, garbledBF); //using gbf with two hash function 
+
+    //simulat the cost of okvs
+    if (setKeys.size() <= (1 << 12)) //set size =2^12
+        this_thread::sleep_for(chrono::milliseconds(52));
+    else if (setKeys.size() <= (1 << 16)) //set size =2^16
+        this_thread::sleep_for(chrono::milliseconds(103));
+    else if (setKeys.size() <= (1 << 20)) //set size =2^16
+        this_thread::sleep_for(chrono::milliseconds(2838));
+    else
+        this_thread::sleep_for(chrono::milliseconds(2838 * (setKeys.size() / (1 << 20))));
+}
+
+inline  void SimulatedOkvsDecode(const std::vector<block> garbledBF, const std::vector<block> setKeys, std::vector<block>& setValues)
+{
+    
+    GbfDecode(garbledBF, setKeys, setValues);
+
+    //simulat the cost of okvs
+    if (setKeys.size() <= (1 << 12)) //set size =2^12
+        this_thread::sleep_for(chrono::milliseconds(3));
+    else if (setKeys.size() <= (1 << 16)) //set size =2^16
+        this_thread::sleep_for(chrono::milliseconds(5));
+    else if (setKeys.size() <= (1 << 20)) //set size =2^16
+        this_thread::sleep_for(chrono::milliseconds(990));
+    else
+        this_thread::sleep_for(chrono::milliseconds(990 * (setKeys.size() / (1 << 20))));
+}
+
+
 inline void PaxosEncode(const std::vector<block> setKeys, const std::vector<block> setValues, std::vector<block>& okvs, uint64_t fieldSize)
 {
     int hashSize=setKeys.size(), gamma = 60, v=20;
@@ -215,7 +271,7 @@ inline void PaxosEncode(const std::vector<block> setKeys, const std::vector<bloc
     dic->encode();
 
     vector<byte> x = dic->getVariables();
-//    memcpy(okvs, x.data(), x.size());
+    memcpy(&okvs, x.data(), x.size());
     dic->checkOutput();
     cout << 'here' << endl;
 
@@ -223,7 +279,25 @@ inline void PaxosEncode(const std::vector<block> setKeys, const std::vector<bloc
 
 inline  void PaxosDecode(const std::vector<block> paxosMat, const std::vector<block> setKeys, std::vector<block>& setValues)
 {
-    cout << "Decode" << endl;
+    vector<byte> x(paxosMat.size()*sizeof(block));
+    memcpy(x.data(), (byte*)&paxosMat, paxosMat.size());
+
+    int hashSize = setKeys.size(), gamma = 60, v = 20, fieldSize = 128;
+    double c1 = 2.4;
+    vector<uint64_t> keys;
+    //    vector<unsigned char> values;
+    keys.resize(hashSize);
+    int fieldSizeBytes = fieldSize % 8 == 0 ? fieldSize / 8 : fieldSize / 8 + 1;
+    int zeroBits = 8 - fieldSize % 8;
+    //    values.resize(hashSize*fieldSizeBytes);
+    ObliviousDictionary* dic = new OBD3Tables(hashSize, c1, fieldSize, gamma, v);
+    dic->init();
+
+    for (int i = 0; i < setKeys.size(); i++) {
+        keys[i] = XXH64(&setKeys[i], 64, 0);
+        auto value = dic->decode(keys[i]);
+        memcpy(&setValues, value.data(), sizeof(block));
+    }
 }
 
 
@@ -324,7 +398,7 @@ inline void PolyTest()
     }
 
     std::vector<block> coefficients;
-    //GbfEncode(key_values, coefficients);
+    //SimulatedOkvsEncode(key_values, coefficients);
     PolyEncode(setKeys, setValues, coefficients);
 
     /*for (size_t i = 0; i < 10; i++)

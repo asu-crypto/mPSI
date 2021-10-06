@@ -1,7 +1,7 @@
 #  Malicious Multiparty Private Set Intersection
 This is the implementation of our [CCS 2021](http://dl.acm.org/citation.cfm?id=2978381)  paper: **Simple, Fast Malicious Multiparty Private Set Intersection**[[ePrint](https://eprint.iacr.org/2021/1221)]. 
 
-NOTE: the current code is under maintenance to integrate the stand-alone OKVS libs. 
+NOTE: the current code is under maintenance to integrate the stand-alone OKVS libs. However, you can still use it to evualate our protocols. 
 
 ## Installations
 ### Clone project
