@@ -17,9 +17,11 @@ else
   exit 1
 fi
 
+thirdpartyDir=$(pwd)
+
 cd ../libPaXoS
 bash install.sh
-cd ../../thirdparty/linux
+cd $thirdpartyDir/linux
 
 bash boost.get &
 bash miracl.get &
